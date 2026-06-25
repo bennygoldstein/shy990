@@ -425,7 +425,7 @@
 
   /* ================= AI ================= */
   var AI_MODEL="claude-opus-4-8";          // highest model
-  var AI_ENDPOINT="";                       // set to a server proxy URL for secure public use; empty = direct browser call with a saved key
+  var AI_ENDPOINT="https://a2z-bylaws-ai.bennygoldstein.workers.dev";  // secure Cloudflare Worker proxy (holds the key server-side)
   var KEY_STORE="a2z_anthropic_key";
   function getKey(){ try{ return localStorage.getItem(KEY_STORE)||""; }catch(e){ return ""; } }
   function setKey(k){ try{ localStorage.setItem(KEY_STORE,k); }catch(e){} }
