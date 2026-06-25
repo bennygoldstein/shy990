@@ -473,16 +473,16 @@
     var btn=$("btnAiGen"); var orig=btn.innerHTML; btn.disabled=true; btn.innerHTML='<span class="spinner"></span>Generating...';
     var full="";
     try{
-      var url, headers, body;
+      var anthropicBody=JSON.stringify({model:AI_MODEL, max_tokens:1500, stream:true, messages:[{role:"user",content:aiPrompt(userText)}]});
+      var url, headers;
       if(AI_ENDPOINT){
+        // secure proxy (Cloudflare Worker) injects the API key server-side and forwards to Anthropic
         url=AI_ENDPOINT; headers={"content-type":"application/json"};
-        body=JSON.stringify({model:AI_MODEL, text:userText});
       } else {
         url="https://api.anthropic.com/v1/messages";
         headers={"content-type":"application/json","x-api-key":key,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"};
-        body=JSON.stringify({model:AI_MODEL, max_tokens:1500, stream:true, messages:[{role:"user",content:aiPrompt(userText)}]});
       }
-      var resp=await fetch(url,{method:"POST",headers:headers,body:body});
+      var resp=await fetch(url,{method:"POST",headers:headers,body:anthropicBody});
       if(!resp.ok){ var et=await resp.text(); throw new Error("API "+resp.status+": "+et.slice(0,300)); }
       var reader=resp.body.getReader(), dec=new TextDecoder(), buf="";
       while(true){
