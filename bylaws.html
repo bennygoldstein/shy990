@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Free Nonprofit Bylaws Generator | A2Z Filings</title>
+<meta name="description" content="Generate 501(c)(3) nonprofit bylaws in minutes. Fill simple fields or describe your nonprofit in plain words (or by voice) and let AI write organized bylaws. Preview live, download a PDF, and submit to A2Z Filings." />
+<link rel="icon" href="assets/logo-a2z.jpg" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/theme.css" />
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wrap">
+    <div class="phone">Call us: <span>561-212-1192</span></div>
+    <div class="util">
+      <a href="https://a2zfilings.com/canadian-application/" target="_blank" rel="noopener">Canadian Application</a>
+      <a href="https://a2zfilings.com/application/" target="_blank" rel="noopener">Start the Application</a>
+      <a href="index.html">990 Generator</a>
+      <a href="https://a2zfilings.com/login/" target="_blank" rel="noopener">Login</a>
+    </div>
+  </div>
+</div>
+
+<header class="site">
+  <div class="wrap">
+    <a class="brand" href="https://a2zfilings.com/" target="_blank" rel="noopener" aria-label="A2Z Filings home">
+      <img src="assets/logo-a2z.jpg" alt="A2Z Filings logo" />
+      <div class="bn">A2Z Filings<small>Nonprofit &amp; 501(c)(3) Specialists</small></div>
+    </a>
+    <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">&#9776;</button>
+    <nav class="main" id="mainNav">
+      <a href="https://a2zfilings.com/" target="_blank" rel="noopener">Home</a>
+      <a href="https://a2zfilings.com/about-us/" target="_blank" rel="noopener">About Us</a>
+      <a href="https://a2zfilings.com/service/" target="_blank" rel="noopener">Services</a>
+      <a href="index.html">990 Generator</a>
+      <a href="https://a2zfilings.com/preparing-501c3-application/" target="_blank" rel="noopener">501(c)(3)</a>
+      <a href="https://a2zfilings.com/contact-us/" target="_blank" rel="noopener">Contact</a>
+    </nav>
+    <div class="navcta">
+      <a class="btn btn-red" href="https://a2zfilings.com/contact-us/" target="_blank" rel="noopener">Talk to an Expert</a>
+    </div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <span class="eyebrow">Free Tool &bull; Powered by A2Z Filings</span>
+    <h1>Generate Your Nonprofit's <span>Bylaws</span> in Minutes</h1>
+    <p>Describe your nonprofit in plain words — or by voice — and let AI write organized 501(c)(3) bylaws for you. Or fill the simple fields yourself. Preview live, download a PDF, and send a copy to our team.</p>
+    <div class="steps">
+      <div class="s"><b>1.</b> Describe it or fill the fields</div>
+      <div class="s"><b>2.</b> Preview your bylaws</div>
+      <div class="s"><b>3.</b> Download or submit</div>
+    </div>
+  </div>
+</section>
+
+<main>
+  <div class="wrap">
+
+    <div id="okBanner" class="banner ok"><span class="ic">&#10003;</span>
+      <div><b>Submitted!</b> Your bylaws have been sent to A2Z Filings and a copy emailed to you.</div></div>
+    <div id="errBanner" class="banner err"><span class="ic">&#9888;</span>
+      <div id="errText">Something went wrong. Please download your PDF and email it to info@a2zfilings.com.</div></div>
+
+    <!-- ===== AI PANEL ===== -->
+    <section class="ai-panel">
+      <div class="ai-head">
+        <h2><span class="spark">&#10024;</span> Generate with AI</h2>
+        <span class="ai-badge">Claude Opus &middot; Highest Model</span>
+      </div>
+      <div class="ai-body">
+        <p class="lead">Just describe your nonprofit in your own words — its name, mission, where it's based, board size, anything you know. AI fills out the whole form and writes organized 501(c)(3) bylaws. You can also use the microphone and talk to it; say <b>"stop"</b> when you're done.</p>
+        <div class="ai-input-wrap">
+          <textarea id="aiText" placeholder="e.g. We're starting Green Future Alliance, an environmental nonprofit in Austin, Texas. Our mission is to plant trees and teach kids about conservation. We'll have about 7 board members serving 2-year terms, a President, Secretary and Treasurer, and meet quarterly. Fiscal year ends December 31..."></textarea>
+        </div>
+        <div class="ai-controls">
+          <button type="button" id="btnAiGen" class="btn btn-gold">&#10024; Generate by AI</button>
+          <button type="button" id="btnMic" class="btn-mic"><span id="micIcon">&#127908;</span> <span id="micLabel">Speak</span></button>
+          <span class="ai-hint" id="aiHint">Tip: the more detail, the better the bylaws.</span>
+        </div>
+
+        <div class="voice-wave" id="voiceWave">
+          <canvas id="waveCanvas" width="600" height="48"></canvas>
+          <span class="voice-status" id="voiceStatus">Listening… say "stop" when done</span>
+          <button type="button" class="vstop" id="btnVoiceStop">Stop</button>
+        </div>
+
+        <div class="ai-stream" id="aiStream"></div>
+        <div class="ai-error" id="aiError"></div>
+
+        <div class="ai-key" id="aiKeyBox">
+          <label for="aiKey">Anthropic API key <span class="hint" style="color:#9fabd6">(one-time — stored only in this browser)</span></label>
+          <input id="aiKey" type="password" placeholder="sk-ant-..." autocomplete="off" />
+          <div class="ai-controls" style="margin-top:10px">
+            <button type="button" id="btnSaveKey" class="btn btn-gold" style="padding:9px 18px">Save key &amp; generate</button>
+            <span class="small">For testing/owner use. For public client use, A2Z should run a small server proxy so the key stays private — see notes.</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="grid">
+
+      <!-- FORM -->
+      <section class="panel" id="formCol">
+        <div class="panel-head"><h2>Bylaws Details</h2><span class="pill">Step 1</span></div>
+        <div class="panel-body">
+          <form id="dataForm" autocomplete="on" novalidate>
+
+            <fieldset>
+              <legend><span class="num">A</span> Organization</legend>
+              <div class="field full"><label for="orgName">Organization legal name <span class="req">*</span></label><input id="orgName" type="text" placeholder="e.g. Green Future Alliance, Inc." /></div>
+              <div class="row three">
+                <div class="field"><label for="state">State of incorporation <span class="req">*</span></label><input id="state" type="text" placeholder="Texas" /></div>
+                <div class="field"><label for="city">Principal office city</label><input id="city" type="text" placeholder="Austin" /></div>
+                <div class="field"><label for="ein">EIN <span class="hint">optional</span></label><input id="ein" type="text" placeholder="12-3456789" maxlength="10" /></div>
+              </div>
+              <div class="field full"><label for="purpose">Purpose / mission <span class="req">*</span></label><textarea id="purpose" placeholder="Describe the charitable, educational, or scientific purpose of the organization..."></textarea></div>
+            </fieldset>
+
+            <fieldset>
+              <legend><span class="num">B</span> Board of Directors</legend>
+              <div class="row three">
+                <div class="field"><label for="minDirectors">Min. directors</label><input id="minDirectors" type="text" inputmode="numeric" placeholder="3" /></div>
+                <div class="field"><label for="maxDirectors">Max. directors</label><input id="maxDirectors" type="text" inputmode="numeric" placeholder="15" /></div>
+                <div class="field"><label for="directorTerm">Term (years)</label><input id="directorTerm" type="text" inputmode="numeric" placeholder="2" /></div>
+              </div>
+              <div class="row">
+                <div class="field"><label for="boardQuorum">Quorum</label><input id="boardQuorum" type="text" placeholder="A majority" /></div>
+                <div class="field"><label for="hasMembers">Voting members?</label>
+                  <select id="hasMembers"><option value="No">No — board-governed</option><option value="Yes">Yes — has members</option></select></div>
+              </div>
+            </fieldset>
+
+            <fieldset>
+              <legend><span class="num">C</span> Officers &amp; Meetings</legend>
+              <div class="field full"><label for="officersList">Officers</label><input id="officersList" type="text" placeholder="President, Vice President, Secretary, and Treasurer" /></div>
+              <div class="row">
+                <div class="field"><label for="annualMeetingMonth">Annual meeting month</label><input id="annualMeetingMonth" type="text" placeholder="January" /></div>
+                <div class="field"><label for="boardFrequency">Board meets</label><input id="boardFrequency" type="text" placeholder="quarterly" /></div>
+              </div>
+            </fieldset>
+
+            <fieldset>
+              <legend><span class="num">D</span> Governance &amp; Policies</legend>
+              <div class="row">
+                <div class="field"><label for="conflictPolicy">Conflict-of-interest article</label>
+                  <select id="conflictPolicy"><option>Include</option><option>Omit</option></select></div>
+                <div class="field"><label for="indemnify">Indemnification article</label>
+                  <select id="indemnify"><option>Include</option><option>Omit</option></select></div>
+              </div>
+              <div class="row">
+                <div class="field"><label for="fiscalYearEnd">Fiscal year ends</label><input id="fiscalYearEnd" type="text" placeholder="December 31" /></div>
+                <div class="field"><label for="amendmentVote">Vote to amend bylaws</label><input id="amendmentVote" type="text" placeholder="two-thirds (2/3)" /></div>
+              </div>
+              <div class="field full"><label for="dissolutionRecipient">On dissolution, assets go to</label><input id="dissolutionRecipient" type="text" placeholder="one or more 501(c)(3) organizations" /></div>
+            </fieldset>
+
+            <fieldset>
+              <legend><span class="num">E</span> Adoption &amp; Contact</legend>
+              <div class="row">
+                <div class="field"><label for="dateAdopted">Date adopted</label><input id="dateAdopted" type="text" placeholder="June 24, 2026" /></div>
+                <div class="field"><label for="signerName">Secretary / signer <span class="req">*</span></label><input id="signerName" type="text" placeholder="e.g. Jordan Lee" /></div>
+              </div>
+              <div class="field full"><label for="clientEmail">Your email <span class="req">*</span> <span class="hint">we'll send your copy here</span></label><input id="clientEmail" type="email" placeholder="you@yourorg.org" /></div>
+            </fieldset>
+
+            <div class="actions">
+              <button type="button" id="btnSample" class="btn btn-sample">Load sample</button>
+              <button type="button" id="btnDownload" class="btn btn-navy btn-wide">&#11015; Download PDF</button>
+              <button type="button" id="btnSubmit" class="btn btn-red btn-wide">&#9993; Submit &amp; Email</button>
+            </div>
+            <div class="note"><b>On submit:</b> your bylaws (PDF + details) are emailed to <b>info@a2zfilings.com</b> and to your email. <b>Download PDF</b> works instantly. This is a customizable template, not legal advice — A2Z Filings will review it with you.</div>
+          </form>
+        </div>
+      </section>
+
+      <!-- PREVIEW -->
+      <section class="panel" id="previewPanel">
+        <div class="panel-head">
+          <h2>Live Preview</h2>
+          <div class="preview-tools">
+            <button type="button" id="btnDownload2" class="pbtn">&#11015; PDF</button>
+            <button type="button" id="btnPrint" class="pbtn">&#128424; Print</button>
+          </div>
+        </div>
+        <div class="doc-scroll">
+          <div class="paper" id="docPreview">
+            <div class="doc-title">Bylaws of <span id="p_orgName">Your Nonprofit</span></div>
+            <div class="doc-sub" id="p_subtitle">A nonprofit corporation organized under Section 501(c)(3) of the Internal Revenue Code</div>
+            <div class="doc-meta" id="p_meta">Prepared by A2Z Filings</div>
+            <div id="p_articles"></div>
+            <div class="doc-foot">Template prepared via a2zfilings.com — a customizable starting point, not legal advice. A2Z Filings will review and tailor these bylaws with you.</div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</main>
+
+<section class="trust"><div class="wrap">
+  <div class="t"><div class="ic">&#10024;</div><h4>AI-Assisted</h4><p>Describe your nonprofit by text or voice and AI writes organized 501(c)(3) bylaws.</p></div>
+  <div class="t"><div class="ic">&#128196;</div><h4>Clean &amp; Complete</h4><p>Standard articles every nonprofit needs — name, purpose, board, officers, dissolution, and more.</p></div>
+  <div class="t"><div class="ic">&#128737;</div><h4>Reviewed by Experts</h4><p>A2Z Filings reviews and tailors your bylaws before filing.</p></div>
+</div></section>
+
+<!-- hidden FormSubmit email form -->
+<form id="emailForm" action="https://formsubmit.co/info@a2zfilings.com" method="POST" enctype="multipart/form-data" style="display:none" aria-hidden="true">
+  <input type="hidden" name="_subject" id="ef_subject" />
+  <input type="hidden" name="_cc" id="ef_cc" />
+  <input type="hidden" name="_template" value="table" />
+  <input type="hidden" name="_captcha" value="false" />
+  <input type="hidden" name="_next" value="https://bennygoldstein.github.io/shy990/bylaws.html?sent=1" />
+  <input type="text" name="_honey" style="display:none" />
+  <input type="hidden" name="Organization" id="ef_org" />
+  <input type="hidden" name="State" id="ef_state" />
+  <input type="hidden" name="Submitted_By_Email" id="ef_clientEmail" />
+  <input type="hidden" name="Full_Details" id="ef_full" />
+  <input type="file" name="attachment" id="ef_attachment" />
+</form>
+
+<footer class="site"><div class="wrap">
+  <div class="cols">
+    <div class="fbrand">
+      <img src="assets/logo-a2z.jpg" alt="A2Z Filings" />
+      <p>A2Z Filings specializes in setting up nonprofits and 501(c)(3) organizations — preparing all the paperwork from incorporation and bylaws to your annual 990 returns.</p>
+      <div class="pay"><span>&#128179; Credit Card</span><span>PayPal</span><span>Zelle</span></div>
+    </div>
+    <div class="contact">
+      <h4>Contact Us</h4>
+      <p><span class="ic">&#9742;</span> <a href="tel:5612121192">561-212-1192</a></p>
+      <p><span class="ic">&#9993;</span> <a href="mailto:info@a2zfilings.com">info@a2zfilings.com</a></p>
+      <p><span class="ic">&#127968;</span> PO Box 880785<br>Boca Raton, FL 33488</p>
+    </div>
+    <div>
+      <h4>Quick Links</h4>
+      <ul>
+        <li><a href="index.html">990 Generator</a></li>
+        <li><a href="https://a2zfilings.com/service/" target="_blank" rel="noopener">Our Services</a></li>
+        <li><a href="https://a2zfilings.com/preparing-501c3-application/" target="_blank" rel="noopener">501(c)(3) Application</a></li>
+        <li><a href="https://a2zfilings.com/contact-us/" target="_blank" rel="noopener">Contact Us</a></li>
+        <li><a href="https://a2zfilings.com/terms-and-conditions-of-service/" target="_blank" rel="noopener">Terms &amp; Conditions</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="copy">&copy; 2026 A2Z Filings. All rights reserved. &nbsp;|&nbsp; <a href="https://a2zfilings.com/" target="_blank" rel="noopener">a2zfilings.com</a></div>
+</div></footer>
+
+<div class="disclaimer"><div class="wrap"><b>Disclaimer:</b> This free tool produces a customizable bylaws template from the information you provide. It is not legal advice and does not create an attorney-client relationship. Have your bylaws reviewed by A2Z Filings or a qualified professional before adoption.</div></div>
+
+<!-- jsPDF (text-based) with fallback -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js" onerror="window.__jspdfFailed=true"></script>
+<script>
+  if (window.__jspdfFailed || !(window.jspdf && window.jspdf.jsPDF)) {
+    var _j=document.createElement('script'); _j.src='https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js'; document.head.appendChild(_j);
+  }
+</script>
+<script src="assets/pdfkit.js"></script>
+<script>
+(function(){
+  "use strict";
+  var $=function(id){return document.getElementById(id);};
+  var txt=PDFKit.txt;
+  function val(id){ var e=$(id); return e?e.value:""; }
+  var ROMAN=["I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII","XIII","XIV","XV"];
+
+  /* fields the AI fills (everything except the user's own email) */
+  var AI_FIELDS=["orgName","state","city","ein","purpose","minDirectors","maxDirectors","directorTerm",
+    "boardQuorum","hasMembers","officersList","annualMeetingMonth","boardFrequency","conflictPolicy",
+    "indemnify","fiscalYearEnd","amendmentVote","dissolutionRecipient","dateAdopted","signerName"];
+
+  function g(id, dflt){ var v=(val(id)||"").trim(); return v?v:dflt; }
+
+  /* ---------- bylaws template ---------- */
+  function articles(){
+    var org=g("orgName","[Organization Name]");
+    var state=g("state","[State]");
+    var city=g("city","[City]");
+    var purpose=g("purpose","[purpose statement]");
+    var minD=g("minDirectors","3"), maxD=g("maxDirectors","15"), term=g("directorTerm","2");
+    var quorum=g("boardQuorum","A majority");
+    var officers=g("officersList","President, Vice President, Secretary, and Treasurer");
+    var annual=g("annualMeetingMonth","January"), freq=g("boardFrequency","quarterly");
+    var fye=g("fiscalYearEnd","December 31");
+    var amend=g("amendmentVote","two-thirds (2/3)");
+    var dissolve=g("dissolutionRecipient","one or more organizations described in Section 501(c)(3) of the Internal Revenue Code");
+    var date=g("dateAdopted","____________"), signer=g("signerName","[Secretary]");
+    var hasMembers=(val("hasMembers")||"No")==="Yes";
+    var inclConflict=(val("conflictPolicy")||"Include")==="Include";
+    var inclIndem=(val("indemnify")||"Include")==="Include";
+
+    var A=[];
+    A.push({t:"Name", b:'The name of the corporation is '+org+' (the "Corporation").'});
+    A.push({t:"Purpose", b:
+      'The Corporation is organized and operated exclusively for charitable, educational, religious, or scientific purposes within the meaning of Section 501(c)(3) of the Internal Revenue Code.\n\n'+
+      'Specifically, the purpose of the Corporation is: '+purpose+'\n\n'+
+      'Notwithstanding any other provision of these Bylaws, the Corporation shall not carry on any activities not permitted to be carried on by an organization exempt from federal income tax under Section 501(c)(3) of the Internal Revenue Code, and no part of the net earnings of the Corporation shall inure to the benefit of any private individual.'});
+    A.push({t:"Offices", b:'The principal office of the Corporation shall be located in '+city+', '+state+'. The Corporation may have such other offices as the Board of Directors may from time to time determine.'});
+    A.push({t:"Members", b: hasMembers
+      ? 'The Corporation shall have one or more classes of voting members. The qualifications, rights, and obligations of members shall be established by the Board of Directors. Members shall be entitled to vote on matters reserved to members by law or by these Bylaws.'
+      : 'The Corporation shall have no members. All rights that would otherwise vest in members shall vest in the Board of Directors, which shall manage the affairs of the Corporation.'});
+    A.push({t:"Board of Directors", b:
+      'Section 1. Powers. The affairs of the Corporation shall be managed by and under the direction of its Board of Directors.\n\n'+
+      'Section 2. Number. The Board of Directors shall consist of no fewer than '+minD+' and no more than '+maxD+' directors.\n\n'+
+      'Section 3. Term. Each director shall serve a term of '+term+' year(s) and may be re-elected to successive terms.\n\n'+
+      'Section 4. Election. Directors shall be elected by the Board of Directors (or by the members, if any) at the annual meeting.\n\n'+
+      'Section 5. Vacancies. Any vacancy on the Board may be filled by a majority vote of the directors then in office.\n\n'+
+      'Section 6. Removal. A director may be removed, with or without cause, by a two-thirds (2/3) vote of the directors then in office.\n\n'+
+      'Section 7. Compensation. Directors shall serve without compensation, except that they may be reimbursed for reasonable expenses incurred in the performance of their duties.'});
+    A.push({t:"Meetings of the Board", b:
+      'Section 1. Annual Meeting. The annual meeting of the Board shall be held in the month of '+annual+'.\n\n'+
+      'Section 2. Regular Meetings. Regular meetings of the Board shall be held '+freq+'.\n\n'+
+      'Section 3. Special Meetings. Special meetings may be called by the President or by any two (2) directors.\n\n'+
+      'Section 4. Notice. Notice of the time and place of meetings shall be given at least seven (7) days in advance, except as otherwise permitted by law.\n\n'+
+      'Section 5. Quorum. '+quorum+' of the directors then in office shall constitute a quorum for the transaction of business.\n\n'+
+      'Section 6. Action Without a Meeting. Any action required or permitted to be taken at a meeting may be taken without a meeting by unanimous written consent of all directors.\n\n'+
+      'Section 7. Electronic Participation. Directors may participate in any meeting by conference telephone or other electronic means by which all participants can hear one another.'});
+    A.push({t:"Officers", b:
+      'Section 1. Officers. The officers of the Corporation shall be: '+officers+'.\n\n'+
+      'Section 2. Election and Term. Officers shall be elected annually by the Board of Directors and shall serve a term of one (1) year or until their successors are elected.\n\n'+
+      'Section 3. President. The President shall be the chief executive officer of the Corporation and shall preside at all meetings of the Board.\n\n'+
+      'Section 4. Vice President. The Vice President shall perform the duties of the President in the President’s absence or inability to act.\n\n'+
+      'Section 5. Secretary. The Secretary shall keep the minutes and records of the Corporation and shall give all required notices.\n\n'+
+      'Section 6. Treasurer. The Treasurer shall have custody of and be responsible for the funds of the Corporation and shall keep accurate financial records.'});
+    A.push({t:"Committees", b:'The Board of Directors may, by resolution, establish one or more committees, each consisting of one or more directors, to serve at the pleasure of the Board. Committees shall have only such authority as the Board expressly delegates.'});
+    if(inclConflict) A.push({t:"Conflict of Interest", b:'The Corporation shall adopt and adhere to a written Conflict of Interest Policy. Any director or officer who has a direct or indirect financial or personal interest in a proposed transaction shall disclose that interest to the Board, shall not participate in discussion except to provide information, and shall not vote on the matter. The disinterested directors shall determine whether the transaction is in the best interest of the Corporation.'});
+    if(inclIndem) A.push({t:"Indemnification", b:'To the fullest extent permitted by the laws of '+state+', the Corporation shall indemnify its directors, officers, employees, and agents against expenses, judgments, and reasonable amounts paid in settlement actually incurred in connection with any action or proceeding arising out of their service to the Corporation, provided they acted in good faith and in a manner reasonably believed to be in the best interest of the Corporation.'});
+    A.push({t:"Books, Records, and Fiscal Year", b:'The Corporation shall keep correct and complete books and records of account and minutes of the proceedings of its Board and committees. The fiscal year of the Corporation shall end on '+fye+' of each year.'});
+    A.push({t:"Amendments", b:'These Bylaws may be amended, altered, or repealed by a '+amend+' vote of the directors then in office at any regular or special meeting, provided that written notice of the proposed amendment was included in the notice of the meeting.'});
+    A.push({t:"Dissolution", b:'Upon the dissolution of the Corporation, and after paying or making provision for the payment of all liabilities, the remaining assets shall be distributed to '+dissolve+', organized and operated exclusively for charitable, educational, religious, or scientific purposes that qualify as exempt under Section 501(c)(3) of the Internal Revenue Code. No assets shall inure to the benefit of any director, officer, or private individual.'});
+
+    var out=A.map(function(a,i){ return {title:"Article "+ROMAN[i]+" — "+a.t, body:a.b}; });
+    out.push({title:"Certification", body:'The undersigned certifies that the foregoing Bylaws were duly adopted by the Board of Directors of '+org+' on '+date+'.\n\n\n_____________________________________\n'+signer+', Secretary'});
+    return out;
+  }
+
+  function subtitle(){
+    var state=g("state",""); var s="A nonprofit corporation";
+    if(state) s+=" organized under the laws of "+state;
+    s+=" and Section 501(c)(3) of the Internal Revenue Code";
+    return s;
+  }
+  function metaLine(){
+    var d=g("dateAdopted",""); return (d? "Adopted "+d+"  •  ":"") + "Prepared by A2Z Filings";
+  }
+
+  function render(){
+    $("p_orgName").textContent=g("orgName","Your Nonprofit");
+    $("p_subtitle").textContent=subtitle();
+    $("p_meta").textContent=metaLine();
+    var host=$("p_articles"); host.innerHTML="";
+    articles().forEach(function(a){
+      var sec=document.createElement("div"); sec.className="docsec";
+      var h=document.createElement("h3"); h.textContent=a.title; sec.appendChild(h);
+      a.body.split(/\n\n+/).forEach(function(p){
+        var para=document.createElement("p"); para.style.margin="0 0 8px"; para.style.whiteSpace="pre-wrap"; para.textContent=p; sec.appendChild(para);
+      });
+      host.appendChild(sec);
+    });
+  }
+
+  function fileName(){ return ("Bylaws_"+g("orgName","Nonprofit").replace(/[^a-z0-9]+/gi,"_")+".pdf").replace(/_+/g,"_"); }
+  function buildPdf(){
+    var d=PDFKit.createDoc();
+    d.title("Bylaws of "+g("orgName","[Organization Name]"), subtitle());
+    d.meta(metaLine());
+    articles().forEach(function(a){
+      d.section(a.title);
+      a.body.split(/\n\n+/).forEach(function(p){ d.paragraph(null,p); });
+    });
+    d.finalize("Template prepared via a2zfilings.com — a customizable starting point, not legal advice. A2Z Filings will review and tailor these bylaws.");
+    return d;
+  }
+  function pdfReady(){ return PDFKit.ready(); }
+  function downloadPDF(){ render(); if(!pdfReady()){ alert("PDF engine still loading — try again in a moment."); return; } try{ buildPdf().save(fileName()); }catch(e){ alert("PDF error: "+(e&&e.message||e)); } }
+  function printPDF(){ render(); if(!pdfReady()){ window.print(); return; } try{ buildPdf().print(); }catch(e){ window.print(); } }
+
+  /* ---------- email submit ---------- */
+  function showOK(){ $("okBanner").classList.add("show"); $("errBanner").classList.remove("show"); window.scrollTo({top:0,behavior:"smooth"}); }
+  function showErr(m){ if(m)$("errText").textContent=m; $("errBanner").classList.add("show"); $("okBanner").classList.remove("show"); window.scrollTo({top:0,behavior:"smooth"}); }
+  function validate(){
+    var req={orgName:"Organization name",state:"State of incorporation",purpose:"Purpose / mission",signerName:"Secretary / signer",clientEmail:"Your email"};
+    for(var k in req){ if(!(val(k)||"").trim()){ $(k).focus(); showErr("Please fill in: "+req[k]+"."); return false; } }
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val("clientEmail").trim())){ $("clientEmail").focus(); showErr("Please enter a valid email."); return false; }
+    return true;
+  }
+  function fullDetails(){
+    var L=["BYLAWS SUBMISSION",""]; AI_FIELDS.forEach(function(k){ L.push(k+": "+(val(k)||"—")); });
+    L.push("clientEmail: "+val("clientEmail"));
+    L.push(""); L.push("---- GENERATED BYLAWS ----");
+    articles().forEach(function(a){ L.push(""); L.push(a.title); L.push(a.body); });
+    return L.join("\n");
+  }
+  function sendDataOnly(){ try{ $("ef_attachment").value=""; }catch(_){ } $("emailForm").submit(); }
+  function submitForm(){
+    if(!validate()) return; render();
+    var btn=$("btnSubmit"), original=btn.innerHTML; btn.disabled=true; btn.innerHTML='<span class="spinner"></span>Sending...';
+    $("ef_subject").value="New Bylaws submission: "+g("orgName","Nonprofit");
+    $("ef_cc").value=val("clientEmail").trim();
+    $("ef_org").value=val("orgName"); $("ef_state").value=val("state");
+    $("ef_clientEmail").value=val("clientEmail"); $("ef_full").value=fullDetails();
+    if(!pdfReady()){ sendDataOnly(); return; }
+    try{ var blob=buildPdf().blob(); var file=new File([blob],fileName(),{type:"application/pdf"}); var dt=new DataTransfer(); dt.items.add(file); $("ef_attachment").files=dt.files; }catch(e){}
+    $("emailForm").submit();
+  }
+
+  /* ---------- sample ---------- */
+  function loadSample(){
+    var s={orgName:"Green Future Alliance, Inc.",state:"Texas",city:"Austin",ein:"88-7654321",
+      purpose:"to protect and restore the natural environment by planting native trees, restoring urban green spaces, and educating children and families about conservation and sustainability.",
+      minDirectors:"3",maxDirectors:"15",directorTerm:"2",boardQuorum:"A majority",officersList:"President, Vice President, Secretary, and Treasurer",
+      annualMeetingMonth:"January",boardFrequency:"quarterly",fiscalYearEnd:"December 31",amendmentVote:"two-thirds (2/3)",
+      dissolutionRecipient:"one or more organizations described in Section 501(c)(3) of the Internal Revenue Code",
+      dateAdopted:"June 24, 2026",signerName:"Jordan Lee"};
+    Object.keys(s).forEach(function(k){ if($(k)) $(k).value=s[k]; });
+    $("hasMembers").value="No"; $("conflictPolicy").value="Include"; $("indemnify").value="Include";
+    render(); if($("previewPanel")) window.scrollTo({top:$("previewPanel").offsetTop-80,behavior:"smooth"});
+  }
+
+  /* ================= AI ================= */
+  var AI_MODEL="claude-opus-4-8";          // highest model
+  var AI_ENDPOINT="";                       // set to a server proxy URL for secure public use; empty = direct browser call with a saved key
+  var KEY_STORE="a2z_anthropic_key";
+  function getKey(){ try{ return localStorage.getItem(KEY_STORE)||""; }catch(e){ return ""; } }
+  function setKey(k){ try{ localStorage.setItem(KEY_STORE,k); }catch(e){} }
+  function aiErr(m){ var e=$("aiError"); e.textContent=m; e.classList.add("show"); }
+  function aiClearErr(){ $("aiError").classList.remove("show"); $("aiError").textContent=""; }
+
+  function aiPrompt(userText){
+    return "You are an expert assistant that prepares 501(c)(3) nonprofit bylaws for a U.S. organization. "+
+      "Read the user's description and extract/compose the information needed. "+
+      "Return ONLY a single JSON object (no markdown, no commentary) with EXACTLY these keys:\n"+
+      '{"orgName":"","state":"","city":"","ein":"","purpose":"","minDirectors":"","maxDirectors":"","directorTerm":"",'+
+      '"boardQuorum":"","hasMembers":"No|Yes","officersList":"","annualMeetingMonth":"","boardFrequency":"",'+
+      '"conflictPolicy":"Include|Omit","indemnify":"Include|Omit","fiscalYearEnd":"","amendmentVote":"","dissolutionRecipient":"","dateAdopted":"","signerName":""}\n'+
+      "Rules: For any value not given, choose a sensible, standard default for a U.S. 501(c)(3) nonprofit "+
+      "(e.g. minDirectors 3, maxDirectors 15, directorTerm 2, boardQuorum \"A majority\", "+
+      "officersList \"President, Vice President, Secretary, and Treasurer\", boardFrequency \"quarterly\", "+
+      "fiscalYearEnd \"December 31\", amendmentVote \"two-thirds (2/3)\", "+
+      "dissolutionRecipient \"one or more organizations described in Section 501(c)(3) of the Internal Revenue Code\", "+
+      "conflictPolicy \"Include\", indemnify \"Include\", hasMembers \"No\"). "+
+      "Write 'purpose' as a polished 1-3 sentence charitable purpose statement (lowercase start, suitable to follow 'the purpose of the Corporation is:'). "+
+      "Numbers as plain digits. Do not invent an EIN — leave it blank if unknown.\n\nUser description:\n"+userText;
+  }
+
+  function applyAi(jsonText){
+    var m=jsonText.match(/\{[\s\S]*\}/); if(!m) throw new Error("no JSON found");
+    var obj=JSON.parse(m[0]);
+    AI_FIELDS.forEach(function(k){
+      if(obj[k]==null) return; var v=String(obj[k]); if(v==="") return;
+      var el=$(k); if(!el) return;
+      if(el.tagName==="SELECT"){
+        if(k==="hasMembers"){ el.value=/^y/i.test(v)?"Yes":"No"; }
+        else { el.value=/omit/i.test(v)?"Omit":"Include"; }
+      } else { el.value=v; }
+    });
+    render();
+  }
+
+  async function streamClaude(userText){
+    var key=getKey();
+    if(AI_ENDPOINT===""){
+      if(!key){ $("aiKeyBox").classList.add("show"); aiErr("Enter your Anthropic API key once to enable AI generation (stored only in this browser)."); return; }
+    }
+    aiClearErr();
+    var stream=$("aiStream"); stream.classList.add("show"); stream.innerHTML='<span class="cursor"></span>';
+    var btn=$("btnAiGen"); var orig=btn.innerHTML; btn.disabled=true; btn.innerHTML='<span class="spinner"></span>Generating...';
+    var full="";
+    try{
+      var url, headers, body;
+      if(AI_ENDPOINT){
+        url=AI_ENDPOINT; headers={"content-type":"application/json"};
+        body=JSON.stringify({model:AI_MODEL, text:userText});
+      } else {
+        url="https://api.anthropic.com/v1/messages";
+        headers={"content-type":"application/json","x-api-key":key,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"};
+        body=JSON.stringify({model:AI_MODEL, max_tokens:1500, stream:true, messages:[{role:"user",content:aiPrompt(userText)}]});
+      }
+      var resp=await fetch(url,{method:"POST",headers:headers,body:body});
+      if(!resp.ok){ var et=await resp.text(); throw new Error("API "+resp.status+": "+et.slice(0,300)); }
+      var reader=resp.body.getReader(), dec=new TextDecoder(), buf="";
+      while(true){
+        var r=await reader.read(); if(r.done) break;
+        buf+=dec.decode(r.value,{stream:true});
+        var parts=buf.split("\n"); buf=parts.pop();
+        for(var i=0;i<parts.length;i++){
+          var line=parts[i].trim(); if(line.indexOf("data:")!==0) continue;
+          var data=line.slice(5).trim(); if(data==="[DONE]"||!data) continue;
+          try{ var ev=JSON.parse(data);
+            var piece = ev.delta && ev.delta.text ? ev.delta.text : (typeof ev.text==="string"? ev.text : "");
+            if(piece){ full+=piece; stream.innerHTML=esc(full)+'<span class="cursor"></span>'; stream.scrollTop=stream.scrollHeight; }
+          }catch(e){}
+        }
+      }
+      stream.innerHTML=esc(full);
+      applyAi(full);
+      $("aiHint").textContent="✓ Form filled and bylaws generated. Review the preview, edit anything, then download.";
+      window.scrollTo({top:$("previewPanel").offsetTop-80,behavior:"smooth"});
+    }catch(e){
+      aiErr("AI generation failed — "+(e&&e.message||e)+". You can still fill the form manually below.");
+      stream.classList.remove("show");
+    }finally{
+      btn.disabled=false; btn.innerHTML=orig;
+    }
+  }
+  function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+  function doGenerate(){
+    var t=(val("aiText")||"").trim();
+    if(!t){ $("aiText").focus(); aiErr("Type a description of your nonprofit first (or use the microphone)."); return; }
+    streamClaude(t);
+  }
+
+  /* ================= VOICE ================= */
+  var rec=null, listening=false, audioCtx=null, micStream=null, rafId=null;
+  function supportsSR(){ return !!(window.SpeechRecognition||window.webkitSpeechRecognition); }
+  function startVoice(){
+    if(listening) return;
+    if(!supportsSR()){ aiErr("Voice input needs Chrome or Edge (Web Speech API). You can still type."); return; }
+    aiClearErr();
+    var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+    rec=new SR(); rec.continuous=true; rec.interimResults=true; rec.lang="en-US";
+    var base=(val("aiText")?val("aiText")+" ":""); var finalT=base;
+    rec.onresult=function(e){
+      var interim="";
+      for(var i=e.resultIndex;i<e.results.length;i++){
+        var tr=e.results[i][0].transcript;
+        if(e.results[i].isFinal){
+          if(/\bstop\b\.?\s*$/i.test(tr.trim())){ finalT+=tr.replace(/\bstop\b\.?\s*$/i,""); stopVoice(); }
+          else finalT+=tr+" ";
+        } else interim+=tr;
+      }
+      $("aiText").value=(finalT+interim).trim();
+      if(/\bstop\b\.?\s*$/i.test(interim.trim())){ stopVoice(); }
+    };
+    rec.onerror=function(e){ if(e.error!=="no-speech") aiErr("Microphone error: "+e.error); };
+    rec.onend=function(){ if(listening){ try{rec.start();}catch(e){} } };
+    try{ rec.start(); }catch(e){}
+    listening=true;
+    $("btnMic").classList.add("live"); $("micLabel").textContent="Listening…";
+    $("voiceWave").classList.add("show"); $("voiceStatus").textContent='Listening… say "stop" when done';
+    startWave();
+  }
+  function stopVoice(){
+    if(!listening) return; listening=false;
+    try{ if(rec) rec.stop(); }catch(e){}
+    $("btnMic").classList.remove("live"); $("micLabel").textContent="Speak";
+    $("voiceStatus").textContent="Captured — review the text, then Generate.";
+    setTimeout(function(){ $("voiceWave").classList.remove("show"); },900);
+    stopWave();
+  }
+  function startWave(){
+    if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){ return; }
+    navigator.mediaDevices.getUserMedia({audio:true}).then(function(stream){
+      micStream=stream;
+      audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+      var src=audioCtx.createMediaStreamSource(stream);
+      var an=audioCtx.createAnalyser(); an.fftSize=128; src.connect(an);
+      var bins=an.frequencyBinCount, data=new Uint8Array(bins);
+      var cv=$("waveCanvas"), ctx=cv.getContext("2d");
+      function draw(){
+        rafId=requestAnimationFrame(draw); an.getByteFrequencyData(data);
+        var w=cv.width=cv.clientWidth||600, h=cv.height; ctx.clearRect(0,0,w,h);
+        var n=Math.min(bins,40), bw=w/n;
+        for(var i=0;i<n;i++){
+          var v=data[i]/255; var bh=Math.max(3, v*h);
+          ctx.fillStyle="rgba(247,197,24,"+(0.5+v*0.5)+")";
+          ctx.fillRect(i*bw+1, (h-bh)/2, bw-2, bh);
+        }
+      }
+      draw();
+    }).catch(function(){ /* no mic: SR may still work */ });
+  }
+  function stopWave(){
+    if(rafId) cancelAnimationFrame(rafId); rafId=null;
+    try{ if(micStream) micStream.getTracks().forEach(function(t){t.stop();}); }catch(e){}
+    try{ if(audioCtx) audioCtx.close(); }catch(e){}
+    micStream=null; audioCtx=null;
+    var cv=$("waveCanvas"); if(cv){ var c=cv.getContext("2d"); c.clearRect(0,0,cv.width,cv.height); }
+  }
+
+  /* ---------- wire up ---------- */
+  var f=$("dataForm");
+  f.addEventListener("input",render); f.addEventListener("change",render);
+  $("btnDownload").addEventListener("click",downloadPDF);
+  $("btnDownload2").addEventListener("click",downloadPDF);
+  $("btnPrint").addEventListener("click",printPDF);
+  $("btnSubmit").addEventListener("click",submitForm);
+  $("btnSample").addEventListener("click",loadSample);
+  $("btnAiGen").addEventListener("click",doGenerate);
+  $("btnSaveKey").addEventListener("click",function(){ var k=val("aiKey").trim(); if(!k){ $("aiKey").focus(); return; } setKey(k); $("aiKeyBox").classList.remove("show"); doGenerate(); });
+  $("btnMic").addEventListener("click",function(){ listening?stopVoice():startVoice(); });
+  $("btnVoiceStop").addEventListener("click",stopVoice);
+  $("menuToggle").addEventListener("click",function(){ $("mainNav").classList.toggle("open"); });
+  if(/[?&]sent=1/.test(location.search)){ showOK(); }
+  render();
+})();
+</script>
+</body>
+</html>
