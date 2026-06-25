@@ -434,12 +434,13 @@
 
   function aiPrompt(userText){
     return "You are an expert assistant that prepares 501(c)(3) nonprofit bylaws for a U.S. organization. "+
-      "Read the user's description and extract/compose the information needed. "+
-      "Return ONLY a single JSON object (no markdown, no commentary) with EXACTLY these keys:\n"+
+      "Read the user's description and produce the information needed. "+
+      "Return ONLY a single minified JSON object — no markdown, no code fences, no words before or after — with EXACTLY these keys:\n"+
       '{"orgName":"","state":"","city":"","ein":"","purpose":"","minDirectors":"","maxDirectors":"","directorTerm":"",'+
       '"boardQuorum":"","hasMembers":"No|Yes","officersList":"","annualMeetingMonth":"","boardFrequency":"",'+
       '"conflictPolicy":"Include|Omit","indemnify":"Include|Omit","fiscalYearEnd":"","amendmentVote":"","dissolutionRecipient":"","dateAdopted":"","signerName":""}\n'+
-      "Rules: For any value not given, choose a sensible, standard default for a U.S. 501(c)(3) nonprofit "+
+      "Rules: ALWAYS fill orgName — if the user gave no name, invent a fitting, professional nonprofit name from the mission. "+
+      "For any value not given, choose a sensible, standard default for a U.S. 501(c)(3) nonprofit "+
       "(e.g. minDirectors 3, maxDirectors 15, directorTerm 2, boardQuorum \"A majority\", "+
       "officersList \"President, Vice President, Secretary, and Treasurer\", boardFrequency \"quarterly\", "+
       "fiscalYearEnd \"December 31\", amendmentVote \"two-thirds (2/3)\", "+
@@ -450,7 +451,8 @@
   }
 
   function applyAi(jsonText){
-    var m=jsonText.match(/\{[\s\S]*\}/); if(!m) throw new Error("no JSON found");
+    var t=String(jsonText).replace(/```[a-z]*/gi,"").replace(/```/g,"");
+    var m=t.match(/\{[\s\S]*\}/); if(!m) throw new Error("the AI didn't return usable data.");
     var obj=JSON.parse(m[0]);
     AI_FIELDS.forEach(function(k){
       if(obj[k]==null) return; var v=String(obj[k]); if(v==="") return;
@@ -469,21 +471,21 @@
       if(!key){ $("aiKeyBox").classList.add("show"); aiErr("Enter your Anthropic API key once to enable AI generation (stored only in this browser)."); return; }
     }
     aiClearErr();
-    var stream=$("aiStream"); stream.classList.add("show"); stream.innerHTML='<span class="cursor"></span>';
-    var btn=$("btnAiGen"); var orig=btn.innerHTML; btn.disabled=true; btn.innerHTML='<span class="spinner"></span>Generating...';
-    var full="";
+    var stream=$("aiStream"); stream.classList.add("show");
+    stream.innerHTML='<span class="spinner"></span> <b>Reading your description…</b>';
+    var btn=$("btnAiGen"); var orig=btn.innerHTML; btn.disabled=true; btn.innerHTML='<span class="spinner"></span>Generating…';
+    var full="", started=false;
     try{
       var anthropicBody=JSON.stringify({model:AI_MODEL, max_tokens:1500, stream:true, messages:[{role:"user",content:aiPrompt(userText)}]});
       var url, headers;
       if(AI_ENDPOINT){
-        // secure proxy (Cloudflare Worker) injects the API key server-side and forwards to Anthropic
-        url=AI_ENDPOINT; headers={"content-type":"application/json"};
+        url=AI_ENDPOINT; headers={"content-type":"application/json"};   // secure proxy injects the key server-side
       } else {
         url="https://api.anthropic.com/v1/messages";
         headers={"content-type":"application/json","x-api-key":key,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"};
       }
       var resp=await fetch(url,{method:"POST",headers:headers,body:anthropicBody});
-      if(!resp.ok){ var et=await resp.text(); throw new Error("API "+resp.status+": "+et.slice(0,300)); }
+      if(!resp.ok){ throw new Error("the AI service returned an error ("+resp.status+"). Please try again in a moment."); }
       var reader=resp.body.getReader(), dec=new TextDecoder(), buf="";
       while(true){
         var r=await reader.read(); if(r.done) break;
@@ -494,16 +496,17 @@
           var data=line.slice(5).trim(); if(data==="[DONE]"||!data) continue;
           try{ var ev=JSON.parse(data);
             var piece = ev.delta && ev.delta.text ? ev.delta.text : (typeof ev.text==="string"? ev.text : "");
-            if(piece){ full+=piece; stream.innerHTML=esc(full)+'<span class="cursor"></span>'; stream.scrollTop=stream.scrollHeight; }
+            if(piece){ full+=piece; if(!started){ started=true; stream.innerHTML='<span class="spinner"></span> <b>Writing your bylaws…</b>'; } }
           }catch(e){}
         }
       }
-      stream.innerHTML=esc(full);
-      applyAi(full);
-      $("aiHint").textContent="✓ Form filled and bylaws generated. Review the preview, edit anything, then download.";
+      applyAi(full);                       // fills the form + renders the preview (never shows raw data)
+      var org=esc(val("orgName")||"your nonprofit");
+      stream.innerHTML='&#10003; <b>Done!</b> I filled out the form and drafted bylaws for <b>'+org+'</b>. Scroll down to review and edit, then Download or Submit.';
+      $("aiHint").textContent="✓ Bylaws generated — review the preview and edit anything.";
       window.scrollTo({top:$("previewPanel").offsetTop-80,behavior:"smooth"});
     }catch(e){
-      aiErr("AI generation failed — "+(e&&e.message||e)+". You can still fill the form manually below.");
+      aiErr("AI generation didn't complete — "+(e&&e.message||e)+" You can still fill the form manually below.");
       stream.classList.remove("show");
     }finally{
       btn.disabled=false; btn.innerHTML=orig;
