@@ -519,66 +519,103 @@
 
   /* ================= VOICE ================= */
   var rec=null, listening=false, audioCtx=null, micStream=null, rafId=null;
+  var liveFinal="", lastSoundAt=0, silenceTimer=null, phase=0, waveAnalyser=null, waveData=null;
   function supportsSR(){ return !!(window.SpeechRecognition||window.webkitSpeechRecognition); }
+  function vStatus(t){ var e=$("voiceStatus"); if(e) e.textContent=t; }
   function startVoice(){
     if(listening) return;
-    if(!supportsSR()){ aiErr("Voice input needs Chrome or Edge (Web Speech API). You can still type."); return; }
+    if(!supportsSR()){ aiErr("Voice typing needs Chrome, Edge, or Safari. You can still type your description in the box."); return; }
     aiClearErr();
+    listening=true; liveFinal=(val("aiText")?val("aiText")+" ":"");
+    $("btnMic").classList.add("live"); $("micLabel").textContent="Listening…";
+    $("voiceWave").classList.add("show"); vStatus('Listening… speak now, then say "stop"');
+    startWave();   // opens the mic + waveform (also triggers the permission prompt)
+
     var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
     rec=new SR(); rec.continuous=true; rec.interimResults=true; rec.lang="en-US";
-    var base=(val("aiText")?val("aiText")+" ":""); var finalT=base;
     rec.onresult=function(e){
       var interim="";
       for(var i=e.resultIndex;i<e.results.length;i++){
         var tr=e.results[i][0].transcript;
         if(e.results[i].isFinal){
-          if(/\bstop\b\.?\s*$/i.test(tr.trim())){ finalT+=tr.replace(/\bstop\b\.?\s*$/i,""); stopVoice(); }
-          else finalT+=tr+" ";
+          if(/\bstop\b[.!]?\s*$/i.test(tr.trim())){ liveFinal+=tr.replace(/\bstop\b[.!]?\s*$/i,""); $("aiText").value=liveFinal.trim(); stopVoice(); return; }
+          liveFinal+=tr+" ";
         } else interim+=tr;
       }
-      $("aiText").value=(finalT+interim).trim();
-      if(/\bstop\b\.?\s*$/i.test(interim.trim())){ stopVoice(); }
+      var full=(liveFinal+interim).trim();
+      $("aiText").value=full;
+      lastSoundAt=Date.now();
+      if(full) vStatus('"'+(full.length>64?"…"+full.slice(-64):full)+'"');
+      if(/\bstop\b[.!]?\s*$/i.test(interim.trim())){ stopVoice(); }
     };
-    rec.onerror=function(e){ if(e.error!=="no-speech") aiErr("Microphone error: "+e.error); };
-    rec.onend=function(){ if(listening){ try{rec.start();}catch(e){} } };
-    try{ rec.start(); }catch(e){}
-    listening=true;
-    $("btnMic").classList.add("live"); $("micLabel").textContent="Listening…";
-    $("voiceWave").classList.add("show"); $("voiceStatus").textContent='Listening… say "stop" when done';
-    startWave();
+    rec.onerror=function(e){
+      if(e.error==="not-allowed"||e.error==="service-not-allowed"){
+        aiErr("Your microphone is blocked for this site. Click the 🎤 or 🔒 icon in your browser's address bar, set the microphone to Allow, reload, then click Speak again.");
+        stopVoice();
+      } else if(e.error==="audio-capture"){
+        aiErr("No microphone was found. Plug one in (or pick the right input in your system sound settings) and try again.");
+        stopVoice();
+      } else if(e.error==="network"){
+        vStatus("Reconnecting to the speech service…");
+      }
+      /* 'no-speech' and 'aborted' happen during normal pauses — keep listening */
+    };
+    rec.onend=function(){ if(listening){ try{ rec.start(); }catch(e){} } };
+    try{ rec.start(); }catch(e){ /* onend will retry */ }
   }
   function stopVoice(){
     if(!listening) return; listening=false;
-    try{ if(rec) rec.stop(); }catch(e){}
+    if(silenceTimer){ clearInterval(silenceTimer); silenceTimer=null; }
+    try{ if(rec){ rec.onend=null; rec.stop(); } }catch(e){}
     $("btnMic").classList.remove("live"); $("micLabel").textContent="Speak";
-    $("voiceStatus").textContent="Captured — review the text, then Generate.";
-    setTimeout(function(){ $("voiceWave").classList.remove("show"); },900);
+    vStatus((val("aiText")||"").trim() ? "Got it — review the text, then click “Generate by AI”." : "Stopped.");
+    setTimeout(function(){ $("voiceWave").classList.remove("show"); },1100);
     stopWave();
   }
-  function startWave(){
-    if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){ return; }
-    navigator.mediaDevices.getUserMedia({audio:true}).then(function(stream){
-      micStream=stream;
-      audioCtx=new (window.AudioContext||window.webkitAudioContext)();
-      var src=audioCtx.createMediaStreamSource(stream);
-      var an=audioCtx.createAnalyser(); an.fftSize=128; src.connect(an);
-      var bins=an.frequencyBinCount, data=new Uint8Array(bins);
-      var cv=$("waveCanvas"), ctx=cv.getContext("2d");
-      function draw(){
-        rafId=requestAnimationFrame(draw); an.getByteFrequencyData(data);
-        var w=cv.width=cv.clientWidth||600, h=cv.height; ctx.clearRect(0,0,w,h);
-        var n=Math.min(bins,40), bw=w/n;
-        for(var i=0;i<n;i++){
-          var v=data[i]/255; var bh=Math.max(3, v*h);
-          ctx.fillStyle="rgba(247,197,24,"+(0.5+v*0.5)+")";
-          ctx.fillRect(i*bw+1, (h-bh)/2, bw-2, bh);
-        }
+  function drawWave(){
+    var cv=$("waveCanvas"); if(!cv) return; var ctx=cv.getContext("2d");
+    (function draw(){
+      rafId=requestAnimationFrame(draw);
+      var w=cv.width=cv.clientWidth||600, h=cv.height||48; ctx.clearRect(0,0,w,h);
+      var n=40, bw=w/n, peak=0; phase+=0.18;
+      if(waveAnalyser && waveData){ waveAnalyser.getByteFrequencyData(waveData); }
+      for(var i=0;i<n;i++){
+        var live=(waveAnalyser&&waveData)?(waveData[Math.floor(i*waveData.length/n)]||0)/255:0;
+        if(live>peak) peak=live;
+        var baseline=0.12+0.09*Math.sin(phase+i*0.45);   // gentle always-on motion so it never looks frozen
+        var amp=Math.max(baseline, live);
+        var bh=Math.max(3, amp*h);
+        ctx.fillStyle="rgba(247,197,24,"+(0.45+amp*0.55)+")";
+        ctx.fillRect(i*bw+1,(h-bh)/2,bw-2,bh);
       }
-      draw();
-    }).catch(function(){ /* no mic: SR may still work */ });
+      if(peak>0.06) lastSoundAt=Date.now();
+    })();
+  }
+  function startWave(){
+    lastSoundAt=Date.now(); waveAnalyser=null; waveData=null;
+    drawWave();   // start the animation IMMEDIATELY so the bar is alive even before the mic connects
+    if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia){
+      navigator.mediaDevices.getUserMedia({audio:true}).then(function(stream){
+        micStream=stream;
+        try{
+          audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+          var src=audioCtx.createMediaStreamSource(stream);
+          var an=audioCtx.createAnalyser(); an.fftSize=128; src.connect(an);
+          waveData=new Uint8Array(an.frequencyBinCount); waveAnalyser=an;   // upgrade to audio-reactive bars
+        }catch(e){ /* keep the baseline animation running */ }
+      }).catch(function(){ /* mic blocked/unavailable — baseline keeps animating; SR error explains why */ });
+    }
+    // watchdog: if nothing is heard for 6s and no text yet, tell the user where to look
+    silenceTimer=setInterval(function(){
+      if(!listening){ clearInterval(silenceTimer); silenceTimer=null; return; }
+      if(Date.now()-lastSoundAt>6000 && !(val("aiText")||"").trim()){
+        vStatus("Not hearing your mic — make sure it's unmuted and selected (check the 🎤 icon in the address bar).");
+      }
+    },2000);
   }
   function stopWave(){
     if(rafId) cancelAnimationFrame(rafId); rafId=null;
+    if(silenceTimer){ clearInterval(silenceTimer); silenceTimer=null; }
     try{ if(micStream) micStream.getTracks().forEach(function(t){t.stop();}); }catch(e){}
     try{ if(audioCtx) audioCtx.close(); }catch(e){}
     micStream=null; audioCtx=null;
