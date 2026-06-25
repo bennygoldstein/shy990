@@ -1,0 +1,1075 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Free Form 990 Generator | A2Z Filings</title>
+<meta name="description" content="Prepare and download your nonprofit's IRS Form 990 in minutes. A free tool by A2Z Filings — enter your organization details, preview the return, download a PDF, and submit it to our team." />
+<link rel="icon" href="assets/logo-a2z.jpg" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#16236b;
+    --navy-dark:#0f1a52;
+    --navy-light:#27357f;
+    --red:#e01a22;
+    --red-dark:#b81319;
+    --gold:#f7c518;
+    --blue:#5b9bd5;
+    --bg:#eef1f8;
+    --card:#ffffff;
+    --ink:#1f2733;
+    --muted:#5b6472;
+    --line:#dde3ee;
+    --ok:#1f9d57;
+    --shadow:0 10px 30px rgba(22,35,107,.10);
+    --radius:14px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:"Source Sans 3",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+    color:var(--ink);
+    background:var(--bg);
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,h4{font-family:"Poppins",sans-serif;margin:0;line-height:1.2}
+  a{color:inherit;text-decoration:none}
+  img{max-width:100%;display:block}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 20px}
+
+  /* ===== Top utility bar ===== */
+  .topbar{background:var(--navy-dark);color:#cdd6f5;font-size:.86rem}
+  .topbar .wrap{display:flex;justify-content:space-between;align-items:center;gap:16px;min-height:40px;flex-wrap:wrap}
+  .topbar a{color:#dfe6fb;opacity:.9;transition:.15s;white-space:nowrap}
+  .topbar a:hover{opacity:1;color:#fff}
+  .topbar .util{display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+  .topbar .phone{font-weight:700;color:#fff}
+  .topbar .phone span{color:var(--gold)}
+
+  /* ===== Main header ===== */
+  header.site{background:#fff;border-bottom:3px solid var(--gold);position:sticky;top:0;z-index:50;box-shadow:0 2px 14px rgba(22,35,107,.06)}
+  header.site .wrap{display:flex;align-items:center;justify-content:space-between;gap:18px;min-height:74px}
+  .brand{display:flex;align-items:center;gap:12px}
+  .brand img{height:52px;width:auto}
+  .brand .bn{font-family:"Poppins";font-weight:700;color:var(--navy);font-size:1.02rem;line-height:1.1}
+  .brand .bn small{display:block;font-weight:600;color:var(--red);font-size:.72rem;letter-spacing:.4px;text-transform:uppercase}
+  nav.main{display:flex;gap:22px;align-items:center}
+  nav.main a{font-weight:600;color:var(--navy);font-size:.95rem;position:relative;padding:6px 2px;transition:.15s}
+  nav.main a:hover{color:var(--red)}
+  nav.main a::after{content:"";position:absolute;left:0;right:100%;bottom:0;height:2px;background:var(--gold);transition:.2s}
+  nav.main a:hover::after{right:0}
+  .btn{display:inline-block;border:none;border-radius:999px;font-weight:700;cursor:pointer;font-family:"Poppins";transition:.18s;text-align:center}
+  .btn-red{background:var(--red);color:#fff;padding:11px 22px;box-shadow:0 6px 16px rgba(224,26,34,.28)}
+  .btn-red:hover{background:var(--red-dark);transform:translateY(-1px)}
+  .btn-navy{background:var(--navy);color:#fff;padding:11px 22px}
+  .btn-navy:hover{background:var(--navy-dark)}
+  .btn-ghost{background:#fff;color:var(--navy);border:2px solid var(--navy);padding:9px 20px}
+  .btn-ghost:hover{background:var(--navy);color:#fff}
+  .navcta{display:flex;gap:10px;align-items:center}
+  .menu-toggle{display:none;background:var(--navy);color:#fff;border:none;border-radius:8px;padding:9px 12px;font-size:1.1rem;cursor:pointer}
+
+  /* ===== Hero ===== */
+  .hero{background:linear-gradient(135deg,var(--navy) 0%,var(--navy-light) 60%,#2c3d92 100%);color:#fff;position:relative;overflow:hidden}
+  .hero::before{content:"";position:absolute;right:-80px;top:-80px;width:320px;height:320px;background:radial-gradient(circle,rgba(247,197,24,.22),transparent 70%)}
+  .hero::after{content:"";position:absolute;left:-60px;bottom:-90px;width:300px;height:300px;background:radial-gradient(circle,rgba(91,155,213,.25),transparent 70%)}
+  .hero .wrap{position:relative;padding:46px 20px 52px;text-align:center}
+  .hero .eyebrow{display:inline-block;background:rgba(247,197,24,.16);color:var(--gold);border:1px solid rgba(247,197,24,.4);padding:6px 16px;border-radius:999px;font-weight:700;font-size:.8rem;letter-spacing:.6px;text-transform:uppercase;margin-bottom:16px}
+  .hero h1{font-size:2.4rem;font-weight:800;margin-bottom:12px}
+  .hero h1 span{color:var(--gold)}
+  .hero p{max-width:720px;margin:0 auto;color:#dbe2fb;font-size:1.08rem}
+  .hero .steps{display:flex;justify-content:center;gap:14px;margin-top:26px;flex-wrap:wrap}
+  .hero .steps .s{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);border-radius:10px;padding:10px 18px;font-size:.9rem;font-weight:600}
+  .hero .steps .s b{color:var(--gold);margin-right:6px}
+
+  /* ===== Layout ===== */
+  main{padding:34px 0 10px}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:26px;align-items:start}
+  @media(max-width:980px){.grid{grid-template-columns:1fr}}
+
+  .panel{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid var(--line);overflow:hidden}
+  .panel-head{background:linear-gradient(90deg,var(--navy),var(--navy-light));color:#fff;padding:16px 22px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .panel-head h2{font-size:1.18rem;font-weight:700}
+  .panel-head .pill{background:rgba(247,197,24,.2);color:var(--gold);border:1px solid rgba(247,197,24,.45);font-size:.72rem;font-weight:700;padding:4px 10px;border-radius:999px;text-transform:uppercase;letter-spacing:.5px}
+  .panel-body{padding:22px}
+
+  fieldset{border:1px solid var(--line);border-radius:12px;margin:0 0 20px;padding:16px 16px 6px}
+  legend{font-family:"Poppins";font-weight:700;color:var(--navy);font-size:1rem;padding:0 10px;display:flex;align-items:center;gap:8px}
+  legend .num{background:var(--gold);color:var(--navy);width:24px;height:24px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:800}
+
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .row.three{grid-template-columns:1fr 1fr 1fr}
+  @media(max-width:560px){.row,.row.three{grid-template-columns:1fr}}
+  .field{margin-bottom:14px}
+  .field.full{grid-column:1/-1}
+  label{display:block;font-weight:600;font-size:.86rem;color:var(--navy);margin-bottom:5px}
+  label .req{color:var(--red)}
+  label .hint{font-weight:500;color:var(--muted);font-size:.78rem}
+  input,select,textarea{
+    width:100%;padding:10px 12px;border:1.5px solid var(--line);border-radius:9px;
+    font-family:inherit;font-size:.95rem;color:var(--ink);background:#fcfdff;transition:.15s;
+  }
+  input:focus,select:focus,textarea:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(91,155,213,.18);background:#fff}
+  textarea{resize:vertical;min-height:78px}
+  .money{position:relative}
+  .money::before{content:"$";position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--muted);font-weight:600}
+  .money input{padding-left:24px}
+  .calc{background:#f3f6fd;border:1.5px dashed var(--blue)}
+  .calc-label{font-size:.78rem;color:var(--blue);font-weight:700}
+
+  .checks{display:flex;flex-wrap:wrap;gap:10px 18px;margin-top:4px}
+  .checks label{display:flex;align-items:center;gap:7px;font-weight:500;color:var(--ink);font-size:.9rem;margin:0;cursor:pointer}
+  .checks input{width:auto}
+
+  .actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:8px}
+  .actions .btn{padding:13px 22px;font-size:.98rem}
+  .btn-wide{flex:1;min-width:180px}
+  .btn-sample{background:#eef1f8;color:var(--navy);border:1.5px solid var(--line)}
+  .btn-sample:hover{background:#e3e8f5}
+
+  .note{font-size:.82rem;color:var(--muted);margin-top:14px;padding:12px 14px;background:#f7f9fd;border-left:3px solid var(--gold);border-radius:8px}
+
+  /* ===== Preview / 990 document ===== */
+  .preview-tools{display:flex;gap:8px;align-items:center}
+  .preview-tools .pbtn{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.25);color:#fff;border-radius:8px;padding:7px 12px;font-size:.82rem;font-weight:600;cursor:pointer}
+  .preview-tools .pbtn:hover{background:rgba(255,255,255,.24)}
+  .doc-scroll{max-height:1100px;overflow:auto;background:#e9edf6;padding:18px;border-radius:0 0 var(--radius) var(--radius)}
+
+  .form990{background:#fff;color:#111;width:100%;max-width:760px;margin:0 auto;padding:26px 30px;font-family:"Source Sans 3",Arial,sans-serif;font-size:12.5px;line-height:1.35;box-shadow:0 2px 12px rgba(0,0,0,.12);position:relative}
+  .form990 .watermark{position:absolute;top:8px;right:14px;font-size:9px;color:#c0392b;border:1px solid #c0392b;border-radius:4px;padding:2px 7px;font-weight:700;letter-spacing:.5px;opacity:.85}
+  .f-top{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #111;padding-bottom:8px}
+  .f-top .ttl{font-weight:800;font-size:21px;font-family:"Poppins"}
+  .f-top .ttl small{display:block;font-size:11px;font-weight:600;color:#333;font-family:"Source Sans 3"}
+  .f-top .omb{text-align:right;font-size:10px;color:#333}
+  .f-top .omb b{font-size:15px;color:#111;font-family:"Poppins"}
+  .f-sub{display:flex;justify-content:space-between;font-size:11px;color:#333;border-bottom:1.5px solid #111;padding:5px 0;margin-bottom:8px}
+  .f-section{border:1.4px solid #111;border-radius:3px;margin:10px 0;overflow:hidden}
+  .f-section > .sh{background:#111;color:#fff;font-weight:700;padding:4px 9px;font-size:12px;font-family:"Poppins";display:flex;justify-content:space-between}
+  .f-section > .sh .pt{background:var(--gold);color:#111;border-radius:3px;padding:0 7px;font-size:10.5px}
+  .f-rows{padding:8px 10px}
+  .frow{display:flex;justify-content:space-between;gap:10px;padding:3px 0;border-bottom:1px dotted #cfcfcf}
+  .frow:last-child{border-bottom:none}
+  .frow .lbl{color:#222}
+  .frow .lbl .ln{display:inline-block;min-width:20px;color:#777;font-weight:700}
+  .frow .val{font-weight:700;text-align:right;color:#0b1f5c;white-space:nowrap}
+  .frow.total{border-top:1.5px solid #111;margin-top:3px;padding-top:5px;font-weight:800}
+  .frow.total .val{color:#111}
+  .kv{display:grid;grid-template-columns:auto 1fr;gap:3px 10px;font-size:11.5px;padding:7px 10px}
+  .kv .k{color:#555;font-weight:600}
+  .kv .v{font-weight:700;color:#0b1f5c}
+  .prog{padding:8px 10px;font-size:11.5px}
+  .prog .desc{margin-top:4px;white-space:pre-wrap;color:#222}
+  .sign{display:grid;grid-template-columns:1fr 1fr;gap:6px 16px;font-size:11px;padding:8px 10px}
+  .sign .sg{border-top:1px solid #111;padding-top:3px;color:#333}
+  .sign .sg b{color:#0b1f5c}
+  .twocol{display:grid;grid-template-columns:1fr 1fr;gap:0}
+  .twocol .frow{padding-left:0}
+  .colhead{display:flex;justify-content:flex-end;gap:34px;font-size:10px;color:#555;font-weight:700;padding:2px 10px 0;text-transform:uppercase}
+
+  /* ===== Success / status banners ===== */
+  .banner{display:none;margin:0 0 22px;border-radius:12px;padding:16px 20px;font-weight:600;box-shadow:var(--shadow)}
+  .banner.show{display:flex;gap:12px;align-items:center}
+  .banner.ok{background:#e7f7ee;color:#136c3a;border:1px solid #bfe6cf}
+  .banner.err{background:#fdeaea;color:#a31419;border:1px solid #f3c4c6}
+  .banner .ic{font-size:1.5rem}
+  .spinner{width:18px;height:18px;border:3px solid rgba(255,255,255,.5);border-top-color:#fff;border-radius:50%;display:inline-block;animation:spin .7s linear infinite;vertical-align:-3px;margin-right:8px}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* ===== Trust strip ===== */
+  .trust{background:#fff;border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin-top:30px}
+  .trust .wrap{display:flex;justify-content:space-around;gap:20px;padding:22px 20px;flex-wrap:wrap;text-align:center}
+  .trust .t{max-width:240px}
+  .trust .t .ic{font-size:1.7rem}
+  .trust .t h4{color:var(--navy);font-size:1rem;margin:6px 0 3px}
+  .trust .t p{margin:0;font-size:.85rem;color:var(--muted)}
+
+  /* ===== Footer ===== */
+  footer.site{background:var(--navy-dark);color:#c9d3f2;margin-top:40px;padding:42px 0 0}
+  footer.site .cols{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:30px}
+  @media(max-width:820px){footer.site .cols{grid-template-columns:1fr}}
+  footer.site h4{color:#fff;font-size:1.05rem;margin-bottom:14px;position:relative;padding-bottom:8px}
+  footer.site h4::after{content:"";position:absolute;left:0;bottom:0;width:38px;height:3px;background:var(--gold);border-radius:2px}
+  footer.site .fbrand img{height:48px;background:#fff;padding:6px 10px;border-radius:8px;margin-bottom:12px}
+  footer.site p{font-size:.9rem;margin:6px 0;color:#c9d3f2}
+  footer.site a{color:#c9d3f2;transition:.15s}
+  footer.site a:hover{color:var(--gold)}
+  footer.site ul{list-style:none;padding:0;margin:0}
+  footer.site ul li{margin:8px 0;font-size:.92rem}
+  footer.site .contact p{display:flex;gap:9px;align-items:flex-start}
+  footer.site .contact .ic{color:var(--gold)}
+  .pay{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+  .pay span{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);border-radius:6px;padding:5px 11px;font-size:.8rem;font-weight:600}
+  .copy{border-top:1px solid rgba(255,255,255,.12);margin-top:30px;padding:16px 0;text-align:center;font-size:.84rem;color:#9fabd6}
+  .copy a{color:var(--gold)}
+
+  .disclaimer{background:#f7f9fd;border-top:1px solid var(--line);padding:18px 0}
+  .disclaimer .wrap{font-size:.78rem;color:var(--muted);text-align:center;max-width:900px}
+
+  @media(max-width:880px){
+    nav.main,.navcta{display:none}
+    .menu-toggle{display:block}
+    nav.main.open{display:flex;position:absolute;top:74px;left:0;right:0;background:#fff;flex-direction:column;padding:14px 20px;box-shadow:var(--shadow);gap:6px;border-bottom:3px solid var(--gold)}
+    nav.main.open a{padding:8px 0;border-bottom:1px solid var(--line)}
+    .hero h1{font-size:1.85rem}
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== Top utility bar ===== -->
+<div class="topbar">
+  <div class="wrap">
+    <div class="phone">Call us: <span>561-212-1192</span></div>
+    <div class="util">
+      <a href="https://a2zfilings.com/canadian-application/" target="_blank" rel="noopener">Canadian Application</a>
+      <a href="https://a2zfilings.com/application/" target="_blank" rel="noopener">Start the Application</a>
+      <a href="https://a2zfilings.com/resources/" target="_blank" rel="noopener">1023 Questionnaires</a>
+      <a href="https://a2zfilings.com/login/" target="_blank" rel="noopener">Login</a>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Header ===== -->
+<header class="site">
+  <div class="wrap">
+    <a class="brand" href="https://a2zfilings.com/" target="_blank" rel="noopener" aria-label="A2Z Filings home">
+      <img src="assets/logo-a2z.jpg" alt="A2Z Filings logo" />
+      <div class="bn">A2Z Filings<small>Nonprofit &amp; 501(c)(3) Specialists</small></div>
+    </a>
+    <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">&#9776;</button>
+    <nav class="main" id="mainNav">
+      <a href="https://a2zfilings.com/" target="_blank" rel="noopener">Home</a>
+      <a href="https://a2zfilings.com/about-us/" target="_blank" rel="noopener">About Us</a>
+      <a href="https://a2zfilings.com/service/" target="_blank" rel="noopener">Services</a>
+      <a href="https://a2zfilings.com/filing-990-tax-returns/" target="_blank" rel="noopener">990 Returns</a>
+      <a href="https://a2zfilings.com/faqs/" target="_blank" rel="noopener">FAQs</a>
+      <a href="https://a2zfilings.com/contact-us/" target="_blank" rel="noopener">Contact</a>
+    </nav>
+    <div class="navcta">
+      <a class="btn btn-red" href="https://a2zfilings.com/contact-us/" target="_blank" rel="noopener">Talk to an Expert</a>
+    </div>
+  </div>
+</header>
+
+<!-- ===== Hero ===== -->
+<section class="hero">
+  <div class="wrap">
+    <span class="eyebrow">Free Tool &bull; Powered by A2Z Filings</span>
+    <h1>Generate Your Nonprofit's <span>Form 990</span> in Minutes</h1>
+    <p>Enter your organization's details below. We'll build a ready-to-review IRS Form 990 for you — preview it live, download it as a PDF, and send a copy straight to our filing team.</p>
+    <div class="steps">
+      <div class="s"><b>1.</b> Enter your details</div>
+      <div class="s"><b>2.</b> Preview your 990</div>
+      <div class="s"><b>3.</b> Download or submit</div>
+    </div>
+  </div>
+</section>
+
+<main>
+  <div class="wrap">
+
+    <div id="okBanner" class="banner ok">
+      <span class="ic">&#10003;</span>
+      <div><b>Submitted!</b> Your Form 990 has been sent to A2Z Filings and a copy emailed to you. Our team will be in touch shortly.</div>
+    </div>
+    <div id="errBanner" class="banner err">
+      <span class="ic">&#9888;</span>
+      <div id="errText">Something went wrong submitting your form. Please download your PDF and email it to info@a2zfilings.com.</div>
+    </div>
+
+    <div class="grid">
+
+      <!-- ============ FORM PANEL ============ -->
+      <section class="panel">
+        <div class="panel-head">
+          <h2>Your Organization's Information</h2>
+          <span class="pill">Step 1</span>
+        </div>
+        <div class="panel-body">
+          <form id="form990data" autocomplete="on" novalidate>
+
+            <fieldset>
+              <legend><span class="num">A</span> Organization &amp; Filing</legend>
+              <div class="field full">
+                <label for="orgName">Organization legal name <span class="req">*</span></label>
+                <input id="orgName" name="orgName" type="text" placeholder="e.g. Helping Hands Foundation, Inc." />
+              </div>
+              <div class="row">
+                <div class="field">
+                  <label for="dba">Doing business as (DBA) <span class="hint">optional</span></label>
+                  <input id="dba" name="dba" type="text" placeholder="If different from above" />
+                </div>
+                <div class="field">
+                  <label for="ein">EIN (Employer ID Number) <span class="req">*</span></label>
+                  <input id="ein" name="ein" type="text" inputmode="numeric" placeholder="12-3456789" maxlength="10" />
+                </div>
+              </div>
+              <div class="row three">
+                <div class="field">
+                  <label for="formType">Which 990 form?</label>
+                  <select id="formType" name="formType">
+                    <option value="Form 990">Form 990 (full)</option>
+                    <option value="Form 990-EZ">Form 990-EZ</option>
+                    <option value="Form 990-N">Form 990-N (e-Postcard)</option>
+                    <option value="Form 990-PF">Form 990-PF (Private Foundation)</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="taxYear">Tax year (calendar)</label>
+                  <input id="taxYear" name="taxYear" type="text" inputmode="numeric" placeholder="2025" maxlength="4" />
+                </div>
+                <div class="field">
+                  <label for="exemptStatus">Tax-exempt status</label>
+                  <select id="exemptStatus" name="exemptStatus">
+                    <option value="501(c)(3)">501(c)(3)</option>
+                    <option value="501(c)(4)">501(c)(4)</option>
+                    <option value="501(c)(6)">501(c)(6)</option>
+                    <option value="501(c) other">501(c) — other</option>
+                    <option value="4947(a)(1)">4947(a)(1)</option>
+                    <option value="527">527</option>
+                  </select>
+                </div>
+              </div>
+              <div class="field full">
+                <label for="street">Street address <span class="req">*</span></label>
+                <input id="street" name="street" type="text" placeholder="123 Main Street, Suite 100" />
+              </div>
+              <div class="row three">
+                <div class="field">
+                  <label for="city">City</label>
+                  <input id="city" name="city" type="text" placeholder="Boca Raton" />
+                </div>
+                <div class="field">
+                  <label for="state">State</label>
+                  <input id="state" name="state" type="text" placeholder="FL" maxlength="20" />
+                </div>
+                <div class="field">
+                  <label for="zip">ZIP</label>
+                  <input id="zip" name="zip" type="text" inputmode="numeric" placeholder="33488" maxlength="10" />
+                </div>
+              </div>
+              <div class="row">
+                <div class="field">
+                  <label for="phone">Phone</label>
+                  <input id="phone" name="phone" type="tel" placeholder="(561) 555-0100" />
+                </div>
+                <div class="field">
+                  <label for="website">Website <span class="hint">optional</span></label>
+                  <input id="website" name="website" type="text" placeholder="www.yourorg.org" />
+                </div>
+              </div>
+              <div class="row three">
+                <div class="field">
+                  <label for="orgForm">Form of organization</label>
+                  <select id="orgForm" name="orgForm">
+                    <option value="Corporation">Corporation</option>
+                    <option value="Trust">Trust</option>
+                    <option value="Association">Association</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="yearFormed">Year formed</label>
+                  <input id="yearFormed" name="yearFormed" type="text" inputmode="numeric" placeholder="2015" maxlength="4" />
+                </div>
+                <div class="field">
+                  <label for="stateDomicile">State of legal domicile</label>
+                  <input id="stateDomicile" name="stateDomicile" type="text" placeholder="FL" maxlength="20" />
+                </div>
+              </div>
+              <div class="field full">
+                <label for="principalOfficer">Name of principal officer <span class="req">*</span></label>
+                <input id="principalOfficer" name="principalOfficer" type="text" placeholder="e.g. Jane A. Director" />
+              </div>
+            </fieldset>
+
+            <fieldset>
+              <legend><span class="num">B</span> Mission &amp; Programs</legend>
+              <div class="field full">
+                <label for="mission">Mission statement <span class="req">*</span></label>
+                <textarea id="mission" name="mission" placeholder="Briefly describe your organization's mission..."></textarea>
+              </div>
+              <div class="field full">
+                <label for="programName">Largest program — name</label>
+                <input id="programName" name="programName" type="text" placeholder="e.g. Community Food Distribution" />
+              </div>
+              <div class="field full">
+                <label for="programDesc">Largest program — description &amp; accomplishments</label>
+                <textarea id="programDesc" name="programDesc" placeholder="Describe what this program did and who it served this year..."></textarea>
+              </div>
+              <div class="row three">
+                <div class="field">
+                  <label for="progExpenses">Program expenses</label>
+                  <div class="money"><input id="progExpenses" name="progExpenses" type="text" inputmode="decimal" placeholder="0" /></div>
+                </div>
+                <div class="field">
+                  <label for="progGrants">Grants in program</label>
+                  <div class="money"><input id="progGrants" name="progGrants" type="text" inputmode="decimal" placeholder="0" /></div>
+                </div>
+                <div class="field">
+                  <label for="progRevenue">Program revenue</label>
+                  <div class="money"><input id="progRevenue" name="progRevenue" type="text" inputmode="decimal" placeholder="0" /></div>
+                </div>
+              </div>
+            </fieldset>
+
+            <fieldset>
+              <legend><span class="num">C</span> Governance (Part I)</legend>
+              <div class="row three">
+                <div class="field">
+                  <label for="votingMembers">Voting members <span class="hint">of board</span></label>
+                  <input id="votingMembers" name="votingMembers" type="text" inputmode="numeric" placeholder="0" />
+                </div>
+                <div class="field">
+                  <label for="independentMembers">Independent voting members</label>
+                  <input id="independentMembers" name="independentMembers" type="text" inputmode="numeric" placeholder="0" />
+                </div>
+                <div class="field">
+                  <label for="employees"># Employees</label>
+                  <input id="employees" name="employees" type="text" inputmode="numeric" placeholder="0" />
+                </div>
+              </div>
+              <div class="field">
+                <label for="volunteers"># Volunteers</label>
+                <input id="volunteers" name="volunteers" type="text" inputmode="numeric" placeholder="0" />
+              </div>
+            </fieldset>
+
+            <fieldset>
+              <legend><span class="num">D</span> Revenue (Part I, lines 8–12)</legend>
+              <div class="row">
+                <div class="field">
+                  <label for="contributions">Contributions &amp; grants <span class="hint">line 8</span></label>
+                  <div class="money"><input id="contributions" name="contributions" type="text" inputmode="decimal" placeholder="0" /></div>
+                </div>
+                <div class="field">
+                  <label for="programServiceRev">Program service revenue <span class="hint">line 9</span></label>
+                  <div class="money"><input id="programServiceRev" name="programServiceRev" type="text" inputmode="decimal" placeholder="0" /></div>
+                </div>
+                <div class="field">
+                  <label for="investmentIncome">Investment income <span class="hint">line 10</span></label>
+                  <div class="money"><input id="investmentIncome" name="investmentIncome" type="text" inputmode="decimal" placeholder="0" /></div>
+                </div>
+                <div class="field">
+                  <label for="otherRevenue">Other revenue <span class="hint">line 11</span></label>
+                  <div class="money"><input id="otherRevenue" name="otherRevenue" type="text" inputmode="decimal" placeholder="0" /></div>
+                </div>
+              </div>
+              <div class="field">
+                <label class="calc-label" for="totalRevenue">Total revenue (line 12) — calculated</label>
+                <div class="money"><input id="totalRevenue" class="calc" type="text" readonly tabindex="-1" /></div>
+              </div>
+            </fieldset>
+
+            <fieldset>
+              <legend><span class="num">E</span> Expenses (Part I, lines 13–18)</legend>
+              <div class="row three">
+                <div class="field">
+                  <label for="grantsPaid">Grants paid <span class="hint">line 13</span></label>
+                  <div class="money"><input id="grantsPaid" name="grantsPaid" type="text" inputmode="decimal" placeholder="0" /></div>
+                </div>
+                <div class="field">
+                  <label for="salaries">Salaries &amp; benefits <span class="hint">line 15</span></label>
+                  <div class="money"><input id="salaries" name="salaries" type="text" inputmode="decimal" placeholder="0" /></div>
+                </div>
+                <div class="field">
+                  <label for="otherExpenses">Other expenses <span class="hint">line 17</span></label>
+                  <div class="money"><input id="otherExpenses" name="otherExpenses" type="text" inputmode="decimal" placeholder="0" /></div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="field">
+                  <label class="calc-label" for="totalExpenses">Total expenses (line 18) — calculated</label>
+                  <div class="money"><input id="totalExpenses" class="calc" type="text" readonly tabindex="-1" /></div>
+                </div>
+                <div class="field">
+                  <label class="calc-label" for="revLessExp">Revenue less expenses (line 19) — calculated</label>
+                  <div class="money"><input id="revLessExp" class="calc" type="text" readonly tabindex="-1" /></div>
+                </div>
+              </div>
+            </fieldset>
+
+            <fieldset>
+              <legend><span class="num">F</span> Net Assets (Part I, lines 20–22)</legend>
+              <div class="colhead-form" style="font-size:.78rem;color:var(--muted);font-weight:700;text-align:right;margin-bottom:4px">Beginning of year &nbsp;&bull;&nbsp; End of year</div>
+              <div class="row">
+                <div class="field">
+                  <label for="assetsBegin">Total assets — beginning</label>
+                  <div class="money"><input id="assetsBegin" name="assetsBegin" type="text" inputmode="decimal" placeholder="0" /></div>
+                </div>
+                <div class="field">
+                  <label for="assetsEnd">Total assets — end</label>
+                  <div class="money"><input id="assetsEnd" name="assetsEnd" type="text" inputmode="decimal" placeholder="0" /></div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="field">
+                  <label for="liabilitiesBegin">Total liabilities — beginning</label>
+                  <div class="money"><input id="liabilitiesBegin" name="liabilitiesBegin" type="text" inputmode="decimal" placeholder="0" /></div>
+                </div>
+                <div class="field">
+                  <label for="liabilitiesEnd">Total liabilities — end</label>
+                  <div class="money"><input id="liabilitiesEnd" name="liabilitiesEnd" type="text" inputmode="decimal" placeholder="0" /></div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="field">
+                  <label class="calc-label" for="netAssetsBegin">Net assets — beginning — calculated</label>
+                  <div class="money"><input id="netAssetsBegin" class="calc" type="text" readonly tabindex="-1" /></div>
+                </div>
+                <div class="field">
+                  <label class="calc-label" for="netAssetsEnd">Net assets — end — calculated</label>
+                  <div class="money"><input id="netAssetsEnd" class="calc" type="text" readonly tabindex="-1" /></div>
+                </div>
+              </div>
+            </fieldset>
+
+            <fieldset>
+              <legend><span class="num">G</span> Signature &amp; Contact</legend>
+              <div class="row">
+                <div class="field">
+                  <label for="signerName">Officer signing name <span class="req">*</span></label>
+                  <input id="signerName" name="signerName" type="text" placeholder="e.g. Jane A. Director" />
+                </div>
+                <div class="field">
+                  <label for="signerTitle">Officer title</label>
+                  <input id="signerTitle" name="signerTitle" type="text" placeholder="e.g. President / Treasurer" />
+                </div>
+              </div>
+              <div class="field full">
+                <label for="clientEmail">Your email <span class="req">*</span> <span class="hint">we'll send your copy here</span></label>
+                <input id="clientEmail" name="clientEmail" type="email" placeholder="you@yourorg.org" />
+              </div>
+            </fieldset>
+
+            <div class="actions">
+              <button type="button" id="btnSample" class="btn btn-sample">Load sample data</button>
+              <button type="button" id="btnDownload" class="btn btn-navy btn-wide">&#11015; Download PDF</button>
+              <button type="button" id="btnSubmit" class="btn btn-red btn-wide">&#9993; Submit &amp; Email to A2Z</button>
+            </div>
+
+            <div class="note">
+              <b>What happens on submit:</b> a PDF copy of your Form 990 draft is emailed to <b>info@a2zfilings.com</b> and to the email you entered above. The <b>Download PDF</b> button always works instantly — no email required. This tool prepares a draft for review; A2Z Filings will verify and handle the official IRS filing.
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <!-- ============ PREVIEW PANEL ============ -->
+      <section class="panel" id="previewPanel">
+        <div class="panel-head">
+          <h2>Live Form 990 Preview</h2>
+          <div class="preview-tools">
+            <button type="button" id="btnDownload2" class="pbtn">&#11015; PDF</button>
+            <button type="button" id="btnPrint" class="pbtn">&#128424; Print</button>
+          </div>
+        </div>
+        <div class="doc-scroll">
+          <!-- The 990 document that gets rendered to PDF -->
+          <div class="form990" id="form990doc">
+            <div class="watermark">DRAFT &mdash; PREPARED BY A2Z FILINGS</div>
+
+            <div class="f-top">
+              <div>
+                <div class="ttl"><span id="d_formType">Form 990</span>
+                  <small>Return of Organization Exempt From Income Tax</small>
+                  <small>Under section 501(c), 527, or 4947(a)(1) of the Internal Revenue Code</small>
+                </div>
+              </div>
+              <div class="omb">
+                <b>OMB No. 1545-0047</b><br>
+                Tax Year <span id="d_taxYear">2025</span><br>
+                <span style="font-size:9px;color:#777">Open to Public Inspection</span>
+              </div>
+            </div>
+
+            <div class="f-sub">
+              <div>For the <span id="d_taxYear2">2025</span> calendar year, or tax year beginning &amp; ending</div>
+              <div>Tax-exempt status: <b id="d_exemptStatus">501(c)(3)</b></div>
+            </div>
+
+            <!-- Identification -->
+            <div class="f-section">
+              <div class="sh"><span>Organization Information</span><span class="pt">Heading</span></div>
+              <div class="kv">
+                <div class="k">C — Name of organization</div><div class="v" id="d_orgName">&mdash;</div>
+                <div class="k">Doing business as</div><div class="v" id="d_dba">&mdash;</div>
+                <div class="k">Address</div><div class="v" id="d_address">&mdash;</div>
+                <div class="k">E — Telephone</div><div class="v" id="d_phone">&mdash;</div>
+                <div class="k">D — Employer ID (EIN)</div><div class="v" id="d_ein">&mdash;</div>
+                <div class="k">F — Principal officer</div><div class="v" id="d_principalOfficer">&mdash;</div>
+                <div class="k">J — Website</div><div class="v" id="d_website">&mdash;</div>
+                <div class="k">K — Form of organization</div><div class="v" id="d_orgForm">&mdash;</div>
+                <div class="k">Year formed / domicile</div><div class="v" id="d_formedDomicile">&mdash;</div>
+                <div class="k">G — Gross receipts</div><div class="v" id="d_grossReceipts">$0</div>
+              </div>
+            </div>
+
+            <!-- Part I Summary -->
+            <div class="f-section">
+              <div class="sh"><span>Summary</span><span class="pt">Part I</span></div>
+              <div class="f-rows">
+                <div class="frow"><div class="lbl"><span class="ln">1</span> Mission</div><div class="val" id="d_missionShort" style="max-width:60%;white-space:normal;text-align:right">&mdash;</div></div>
+                <div class="frow"><div class="lbl"><span class="ln">3</span> Voting members of governing body</div><div class="val" id="d_votingMembers">0</div></div>
+                <div class="frow"><div class="lbl"><span class="ln">4</span> Independent voting members</div><div class="val" id="d_independentMembers">0</div></div>
+                <div class="frow"><div class="lbl"><span class="ln">5</span> Total employees</div><div class="val" id="d_employees">0</div></div>
+                <div class="frow"><div class="lbl"><span class="ln">6</span> Total volunteers</div><div class="val" id="d_volunteers">0</div></div>
+              </div>
+            </div>
+
+            <!-- Revenue -->
+            <div class="f-section">
+              <div class="sh"><span>Revenue</span><span class="pt">Part I &middot; 8–12</span></div>
+              <div class="f-rows">
+                <div class="frow"><div class="lbl"><span class="ln">8</span> Contributions and grants</div><div class="val" id="d_contributions">$0</div></div>
+                <div class="frow"><div class="lbl"><span class="ln">9</span> Program service revenue</div><div class="val" id="d_programServiceRev">$0</div></div>
+                <div class="frow"><div class="lbl"><span class="ln">10</span> Investment income</div><div class="val" id="d_investmentIncome">$0</div></div>
+                <div class="frow"><div class="lbl"><span class="ln">11</span> Other revenue</div><div class="val" id="d_otherRevenue">$0</div></div>
+                <div class="frow total"><div class="lbl"><span class="ln">12</span> Total revenue</div><div class="val" id="d_totalRevenue">$0</div></div>
+              </div>
+            </div>
+
+            <!-- Expenses -->
+            <div class="f-section">
+              <div class="sh"><span>Expenses</span><span class="pt">Part I &middot; 13–19</span></div>
+              <div class="f-rows">
+                <div class="frow"><div class="lbl"><span class="ln">13</span> Grants and similar amounts paid</div><div class="val" id="d_grantsPaid">$0</div></div>
+                <div class="frow"><div class="lbl"><span class="ln">15</span> Salaries, other compensation, benefits</div><div class="val" id="d_salaries">$0</div></div>
+                <div class="frow"><div class="lbl"><span class="ln">17</span> Other expenses</div><div class="val" id="d_otherExpenses">$0</div></div>
+                <div class="frow total"><div class="lbl"><span class="ln">18</span> Total expenses</div><div class="val" id="d_totalExpenses">$0</div></div>
+                <div class="frow total"><div class="lbl"><span class="ln">19</span> Revenue less expenses</div><div class="val" id="d_revLessExp">$0</div></div>
+              </div>
+            </div>
+
+            <!-- Net assets -->
+            <div class="f-section">
+              <div class="sh"><span>Net Assets or Fund Balances</span><span class="pt">Part I &middot; 20–22</span></div>
+              <div class="colhead"><span>Beginning</span><span>End of year</span></div>
+              <div class="f-rows">
+                <div class="frow"><div class="lbl"><span class="ln">20</span> Total assets</div><div class="val"><span id="d_assetsBegin">$0</span> &nbsp;&middot;&nbsp; <span id="d_assetsEnd">$0</span></div></div>
+                <div class="frow"><div class="lbl"><span class="ln">21</span> Total liabilities</div><div class="val"><span id="d_liabilitiesBegin">$0</span> &nbsp;&middot;&nbsp; <span id="d_liabilitiesEnd">$0</span></div></div>
+                <div class="frow total"><div class="lbl"><span class="ln">22</span> Net assets or fund balances</div><div class="val"><span id="d_netAssetsBegin">$0</span> &nbsp;&middot;&nbsp; <span id="d_netAssetsEnd">$0</span></div></div>
+              </div>
+            </div>
+
+            <!-- Part III Program -->
+            <div class="f-section">
+              <div class="sh"><span>Statement of Program Service Accomplishments</span><span class="pt">Part III</span></div>
+              <div class="prog">
+                <div><b>Mission:</b> <span id="d_mission">&mdash;</span></div>
+                <div style="margin-top:6px"><b>4a — Program:</b> <span id="d_programName">&mdash;</span>
+                  &nbsp;(Expenses <span id="d_progExpenses">$0</span> incl. grants <span id="d_progGrants">$0</span>; Revenue <span id="d_progRevenue">$0</span>)</div>
+                <div class="desc" id="d_programDesc">&mdash;</div>
+              </div>
+            </div>
+
+            <!-- Signature -->
+            <div class="f-section">
+              <div class="sh"><span>Signature Block</span><span class="pt">Part II</span></div>
+              <div class="sign">
+                <div class="sg">Signature of officer<br><b id="d_signerName">&mdash;</b></div>
+                <div class="sg">Title<br><b id="d_signerTitle">&mdash;</b></div>
+                <div class="sg">Paid preparer<br><b>A2Z Filings</b> &mdash; PO Box 880785, Boca Raton, FL 33488</div>
+                <div class="sg">Preparer phone<br><b>561-212-1192</b></div>
+              </div>
+            </div>
+
+            <div style="font-size:9px;color:#888;margin-top:8px;text-align:center">
+              Draft prepared via a2zfilings.com Form 990 generator. Not an official IRS-filed return. A2Z Filings will review and complete the official filing.
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div><!-- /grid -->
+  </div>
+</main>
+
+<!-- Trust strip -->
+<section class="trust">
+  <div class="wrap">
+    <div class="t"><div class="ic">&#128196;</div><h4>Built for Nonprofits</h4><p>Designed around the IRS Form 990 so your draft is organized the way the IRS expects.</p></div>
+    <div class="t"><div class="ic">&#9889;</div><h4>Ready in Minutes</h4><p>Fill simple fields, watch your return build live, and download a PDF instantly.</p></div>
+    <div class="t"><div class="ic">&#128737;</div><h4>Reviewed by Experts</h4><p>A2Z Filings verifies every submission before the official IRS filing.</p></div>
+  </div>
+</section>
+
+<!-- Hidden form used only to email the submission via FormSubmit -->
+<form id="emailForm" action="https://formsubmit.co/info@a2zfilings.com" method="POST" enctype="multipart/form-data" style="display:none" aria-hidden="true">
+  <input type="hidden" name="_subject" id="ef_subject" value="New Form 990 submission via a2zfilings.com" />
+  <input type="hidden" name="_cc" id="ef_cc" value="" />
+  <input type="hidden" name="_template" value="table" />
+  <input type="hidden" name="_captcha" value="false" />
+  <input type="hidden" name="_next" id="ef_next" value="https://bennygoldstein.github.io/shy990/?sent=1" />
+  <input type="text" name="_honey" style="display:none" />
+  <input type="hidden" name="Organization" id="ef_org" />
+  <input type="hidden" name="EIN" id="ef_ein" />
+  <input type="hidden" name="Form_Type" id="ef_formType" />
+  <input type="hidden" name="Tax_Year" id="ef_taxYear" />
+  <input type="hidden" name="Exempt_Status" id="ef_exempt" />
+  <input type="hidden" name="Address" id="ef_address" />
+  <input type="hidden" name="Phone" id="ef_phone" />
+  <input type="hidden" name="Website" id="ef_website" />
+  <input type="hidden" name="Principal_Officer" id="ef_officer" />
+  <input type="hidden" name="Mission" id="ef_mission" />
+  <input type="hidden" name="Total_Revenue" id="ef_totalRev" />
+  <input type="hidden" name="Total_Expenses" id="ef_totalExp" />
+  <input type="hidden" name="Net_Assets_End" id="ef_netEnd" />
+  <input type="hidden" name="Submitted_By_Email" id="ef_clientEmail" />
+  <input type="hidden" name="Full_Details" id="ef_full" />
+  <!-- PDF attachment is injected here at submit time -->
+  <input type="file" name="attachment" id="ef_attachment" />
+</form>
+
+<!-- Footer -->
+<footer class="site">
+  <div class="wrap">
+    <div class="cols">
+      <div class="fbrand">
+        <img src="assets/logo-a2z.jpg" alt="A2Z Filings" />
+        <p>A2Z Filings specializes in setting up nonprofits and 501(c)(3) organizations — preparing all the paperwork from incorporation to your annual 990 returns.</p>
+        <div class="pay">
+          <span>&#128179; Credit Card</span><span>PayPal</span><span>Zelle</span>
+        </div>
+      </div>
+      <div class="contact">
+        <h4>Contact Us</h4>
+        <p><span class="ic">&#9742;</span> <a href="tel:5612121192">561-212-1192</a></p>
+        <p><span class="ic">&#9993;</span> <a href="mailto:info@a2zfilings.com">info@a2zfilings.com</a></p>
+        <p><span class="ic">&#127968;</span> PO Box 880785<br>Boca Raton, FL 33488</p>
+      </div>
+      <div>
+        <h4>Quick Links</h4>
+        <ul>
+          <li><a href="https://a2zfilings.com/about-us/" target="_blank" rel="noopener">About Us</a></li>
+          <li><a href="https://a2zfilings.com/service/" target="_blank" rel="noopener">Our Services</a></li>
+          <li><a href="https://a2zfilings.com/filing-990-tax-returns/" target="_blank" rel="noopener">990 Tax Returns</a></li>
+          <li><a href="https://a2zfilings.com/contact-us/" target="_blank" rel="noopener">Contact Us</a></li>
+          <li><a href="https://a2zfilings.com/terms-and-conditions-of-service/" target="_blank" rel="noopener">Terms &amp; Conditions</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="copy">
+      &copy; 2026 A2Z Filings. All rights reserved. &nbsp;|&nbsp; <a href="https://a2zfilings.com/" target="_blank" rel="noopener">a2zfilings.com</a>
+    </div>
+  </div>
+</footer>
+
+<div class="disclaimer">
+  <div class="wrap">
+    <b>Disclaimer:</b> This free tool helps you prepare a draft of IRS Form 990 based on the information you provide. It does not file your return with the IRS and is not a substitute for professional tax advice. Figures and entries should be reviewed by A2Z Filings before any official filing. By submitting, you agree that A2Z Filings may contact you regarding your nonprofit filing.
+  </div>
+</div>
+
+<!-- html2pdf bundles jsPDF + html2canvas -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.2/html2pdf.bundle.min.js"></script>
+<script>
+(function(){
+  "use strict";
+  var $ = function(id){ return document.getElementById(id); };
+
+  /* ---------- helpers ---------- */
+  function num(v){
+    if(v==null) return 0;
+    var n = parseFloat(String(v).replace(/[^0-9.\-]/g,""));
+    return isNaN(n) ? 0 : n;
+  }
+  function money(v){
+    var n = num(v);
+    var neg = n < 0;
+    n = Math.abs(Math.round(n));
+    var s = n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    return (neg ? "-$" : "$") + s;
+  }
+  function txt(v, dash){ v = (v==null?"":String(v)).trim(); return v ? v : (dash||"—"); }
+  function setText(id, v){ var el=$(id); if(el) el.textContent = v; }
+
+  /* fields that are simple text passthrough to the preview */
+  var passthrough = [
+    "orgName","dba","ein","principalOfficer","website","phone",
+    "votingMembers","independentMembers","employees","volunteers",
+    "programName","signerName","signerTitle"
+  ];
+  /* money fields -> formatted */
+  var moneyFields = [
+    "contributions","programServiceRev","investmentIncome","otherRevenue",
+    "grantsPaid","salaries","otherExpenses",
+    "assetsBegin","assetsEnd","liabilitiesBegin","liabilitiesEnd",
+    "progExpenses","progGrants","progRevenue"
+  ];
+
+  function render(){
+    /* identification */
+    setText("d_formType", txt($("formType").value, "Form 990"));
+    setText("d_taxYear", txt($("taxYear").value, "2025"));
+    setText("d_taxYear2", txt($("taxYear").value, "2025"));
+    setText("d_exemptStatus", txt($("exemptStatus").value, "501(c)(3)"));
+    setText("d_orgName", txt($("orgName").value));
+    setText("d_dba", txt($("dba").value));
+    var addr = [$("street").value, [ $("city").value, $("state").value ].filter(Boolean).join(", "), $("zip").value].filter(function(x){return x && x.trim();}).join("  ");
+    setText("d_address", txt(addr));
+    setText("d_phone", txt($("phone").value));
+    setText("d_ein", txt($("ein").value));
+    setText("d_principalOfficer", txt($("principalOfficer").value));
+    setText("d_website", txt($("website").value));
+    setText("d_orgForm", txt($("orgForm").value));
+    var fd = [ $("yearFormed").value, $("stateDomicile").value ].filter(function(x){return x && x.trim();}).join("  /  ");
+    setText("d_formedDomicile", txt(fd));
+
+    /* passthrough */
+    passthrough.forEach(function(id){
+      if(["orgName","dba","ein","principalOfficer","website","phone","programName","signerName","signerTitle"].indexOf(id) >= 0){
+        setText("d_"+id, txt($(id).value));
+      } else {
+        setText("d_"+id, txt($(id).value, "0"));
+      }
+    });
+
+    /* mission */
+    setText("d_mission", txt($("mission").value));
+    var m = ($("mission").value||"").trim();
+    setText("d_missionShort", m ? (m.length>90 ? m.slice(0,90)+"…" : m) : "—");
+    setText("d_programDesc", txt($("programDesc").value));
+
+    /* money passthrough */
+    moneyFields.forEach(function(id){ setText("d_"+id, money($(id).value)); });
+
+    /* ---- calculations ---- */
+    var contributions = num($("contributions").value);
+    var programRev     = num($("programServiceRev").value);
+    var investment     = num($("investmentIncome").value);
+    var otherRev       = num($("otherRevenue").value);
+    var totalRev = contributions + programRev + investment + otherRev;
+
+    var grants   = num($("grantsPaid").value);
+    var salaries = num($("salaries").value);
+    var otherExp = num($("otherExpenses").value);
+    var totalExp = grants + salaries + otherExp;
+
+    var revLess = totalRev - totalExp;
+
+    var aB = num($("assetsBegin").value), aE = num($("assetsEnd").value);
+    var lB = num($("liabilitiesBegin").value), lE = num($("liabilitiesEnd").value);
+    var naB = aB - lB, naE = aE - lE;
+
+    /* mirror to read-only inputs */
+    $("totalRevenue").value  = money(totalRev);
+    $("totalExpenses").value = money(totalExp);
+    $("revLessExp").value    = money(revLess);
+    $("netAssetsBegin").value= money(naB);
+    $("netAssetsEnd").value  = money(naE);
+
+    /* mirror to preview */
+    setText("d_totalRevenue", money(totalRev));
+    setText("d_totalExpenses", money(totalExp));
+    setText("d_revLessExp", money(revLess));
+    setText("d_assetsBegin", money(aB));
+    setText("d_assetsEnd", money(aE));
+    setText("d_liabilitiesBegin", money(lB));
+    setText("d_liabilitiesEnd", money(lE));
+    setText("d_netAssetsBegin", money(naB));
+    setText("d_netAssetsEnd", money(naE));
+    setText("d_grossReceipts", money(totalRev));
+  }
+
+  /* ---------- bind inputs ---------- */
+  var formEl = $("form990data");
+  formEl.addEventListener("input", render);
+  formEl.addEventListener("change", render);
+
+  /* ---------- PDF ---------- */
+  function pdfWorker(){
+    var el = $("form990doc");
+    var fname = ("Form990_" + (txt($("orgName").value,"Nonprofit").replace(/[^a-z0-9]+/gi,"_")) + ".pdf").replace(/_+/g,"_");
+    var opt = {
+      margin:[8,8,8,8],
+      filename: fname,
+      image:{type:"jpeg", quality:0.97},
+      html2canvas:{scale:2, useCORS:true, backgroundColor:"#ffffff", logging:false},
+      jsPDF:{unit:"mm", format:"a4", orientation:"portrait"},
+      pagebreak:{mode:["css","legacy"]}
+    };
+    return { worker: window.html2pdf().set(opt).from(el), filename: fname };
+  }
+  function downloadPDF(){
+    render();
+    try { pdfWorker().worker.save(); }
+    catch(e){ alert("PDF generation failed: " + e.message); }
+  }
+
+  /* ---------- success / error banners ---------- */
+  function showOK(){ $("okBanner").classList.add("show"); $("errBanner").classList.remove("show"); window.scrollTo({top:0,behavior:"smooth"}); }
+  function showErr(msg){ if(msg) $("errText").textContent = msg; $("errBanner").classList.add("show"); $("okBanner").classList.remove("show"); window.scrollTo({top:0,behavior:"smooth"}); }
+
+  /* ---------- validation ---------- */
+  function validate(){
+    var required = {orgName:"Organization name", ein:"EIN", street:"Street address",
+      principalOfficer:"Principal officer", mission:"Mission statement",
+      signerName:"Officer signing name", clientEmail:"Your email"};
+    for(var k in required){
+      if(!($(k).value||"").trim()){
+        $(k).focus();
+        showErr("Please fill in: " + required[k] + " (required to submit).");
+        return false;
+      }
+    }
+    var email = $("clientEmail").value.trim();
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+      $("clientEmail").focus();
+      showErr("Please enter a valid email address so we can send your copy.");
+      return false;
+    }
+    return true;
+  }
+
+  /* ---------- build full details text ---------- */
+  function buildFullDetails(){
+    var L = [];
+    function add(label, val){ L.push(label + ": " + (val||"—")); }
+    add("Organization", $("orgName").value);
+    add("DBA", $("dba").value);
+    add("EIN", $("ein").value);
+    add("Form type", $("formType").value);
+    add("Tax year", $("taxYear").value);
+    add("Exempt status", $("exemptStatus").value);
+    add("Address", [$("street").value, $("city").value, $("state").value, $("zip").value].filter(Boolean).join(", "));
+    add("Phone", $("phone").value);
+    add("Website", $("website").value);
+    add("Org form", $("orgForm").value);
+    add("Year formed", $("yearFormed").value);
+    add("State of domicile", $("stateDomicile").value);
+    add("Principal officer", $("principalOfficer").value);
+    add("Mission", $("mission").value);
+    add("Voting members", $("votingMembers").value);
+    add("Independent members", $("independentMembers").value);
+    add("Employees", $("employees").value);
+    add("Volunteers", $("volunteers").value);
+    L.push("--- Revenue ---");
+    add("Contributions & grants (8)", money($("contributions").value));
+    add("Program service revenue (9)", money($("programServiceRev").value));
+    add("Investment income (10)", money($("investmentIncome").value));
+    add("Other revenue (11)", money($("otherRevenue").value));
+    add("Total revenue (12)", $("totalRevenue").value);
+    L.push("--- Expenses ---");
+    add("Grants paid (13)", money($("grantsPaid").value));
+    add("Salaries & benefits (15)", money($("salaries").value));
+    add("Other expenses (17)", money($("otherExpenses").value));
+    add("Total expenses (18)", $("totalExpenses").value);
+    add("Revenue less expenses (19)", $("revLessExp").value);
+    L.push("--- Net Assets ---");
+    add("Assets begin / end", money($("assetsBegin").value)+" / "+money($("assetsEnd").value));
+    add("Liabilities begin / end", money($("liabilitiesBegin").value)+" / "+money($("liabilitiesEnd").value));
+    add("Net assets begin / end", $("netAssetsBegin").value+" / "+$("netAssetsEnd").value);
+    L.push("--- Program (Part III) ---");
+    add("Program name", $("programName").value);
+    add("Program expenses/grants/revenue", money($("progExpenses").value)+" / "+money($("progGrants").value)+" / "+money($("progRevenue").value));
+    add("Program description", $("programDesc").value);
+    L.push("--- Signature ---");
+    add("Officer signing", $("signerName").value);
+    add("Title", $("signerTitle").value);
+    add("Submitted by (email)", $("clientEmail").value);
+    return L.join("\n");
+  }
+
+  /* ---------- submit (email via FormSubmit, with PDF attachment) ---------- */
+  function submitForm(){
+    if(!validate()) return;
+    render();
+
+    var btn = $("btnSubmit");
+    var original = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span>Preparing &amp; sending...';
+
+    /* populate hidden email form */
+    $("ef_subject").value = "New Form 990 submission: " + txt($("orgName").value,"Nonprofit");
+    $("ef_cc").value      = $("clientEmail").value.trim();
+    $("ef_org").value     = $("orgName").value;
+    $("ef_ein").value     = $("ein").value;
+    $("ef_formType").value= $("formType").value;
+    $("ef_taxYear").value = $("taxYear").value;
+    $("ef_exempt").value  = $("exemptStatus").value;
+    $("ef_address").value = [$("street").value,$("city").value,$("state").value,$("zip").value].filter(Boolean).join(", ");
+    $("ef_phone").value   = $("phone").value;
+    $("ef_website").value = $("website").value;
+    $("ef_officer").value = $("principalOfficer").value;
+    $("ef_mission").value = $("mission").value;
+    $("ef_totalRev").value= $("totalRevenue").value;
+    $("ef_totalExp").value= $("totalExpenses").value;
+    $("ef_netEnd").value  = $("netAssetsEnd").value;
+    $("ef_clientEmail").value = $("clientEmail").value;
+    $("ef_full").value    = buildFullDetails();
+
+    /* generate the PDF as a blob, attach it, then submit */
+    var job = pdfWorker();
+    job.worker.outputPdf("blob").then(function(blob){
+      try{
+        var file = new File([blob], job.filename, {type:"application/pdf"});
+        var dt = new DataTransfer();
+        dt.items.add(file);
+        $("ef_attachment").files = dt.files;
+      }catch(e){ /* attachment optional; details still sent in body */ }
+      $("emailForm").submit();           // FormSubmit handles email + redirect (_next)
+      /* fallback UI in case redirect is blocked (opens in new tab) */
+      setTimeout(function(){
+        btn.disabled = false;
+        btn.innerHTML = original;
+        showOK();
+      }, 1500);
+    }).catch(function(e){
+      /* even if PDF fails, send the data */
+      try{ $("emailForm").submit(); }catch(_){}
+      btn.disabled = false;
+      btn.innerHTML = original;
+      showErr("We sent your details, but the PDF attachment could not be generated. Please also click “Download PDF” and email it to info@a2zfilings.com.");
+    });
+  }
+
+  /* ---------- sample data ---------- */
+  function loadSample(){
+    var s = {
+      orgName:"Helping Hands Community Foundation, Inc.", dba:"Helping Hands",
+      ein:"47-1234567", taxYear:"2025",
+      street:"500 Charity Lane, Suite 210", city:"Boca Raton", state:"FL", zip:"33488",
+      phone:"(561) 555-0142", website:"www.helpinghandsfoundation.org",
+      yearFormed:"2014", stateDomicile:"FL",
+      principalOfficer:"Jane A. Director",
+      mission:"To relieve hunger and provide essential support services to low-income families throughout South Florida.",
+      programName:"Community Food Distribution Program",
+      programDesc:"Distributed over 480,000 meals to 12,500 individuals across 18 partner sites, and provided weekend backpacks of food to 2,300 schoolchildren.",
+      progExpenses:"612000", progGrants:"85000", progRevenue:"42000",
+      votingMembers:"9", independentMembers:"8", employees:"14", volunteers:"260",
+      contributions:"845000", programServiceRev:"42000", investmentIncome:"6300", otherRevenue:"11500",
+      grantsPaid:"120000", salaries:"410000", otherExpenses:"265000",
+      assetsBegin:"540000", assetsEnd:"688000", liabilitiesBegin:"95000", liabilitiesEnd:"82000",
+      signerName:"Jane A. Director", signerTitle:"President & Treasurer",
+      clientEmail:""
+    };
+    Object.keys(s).forEach(function(k){ if($(k)) $(k).value = s[k]; });
+    $("formType").value = "Form 990";
+    $("exemptStatus").value = "501(c)(3)";
+    $("orgForm").value = "Corporation";
+    render();
+    window.scrollTo({top: $("previewPanel") ? $("previewPanel").offsetTop-80 : 0, behavior:"smooth"});
+  }
+
+  /* ---------- wire up ---------- */
+  $("btnDownload").addEventListener("click", downloadPDF);
+  $("btnDownload2").addEventListener("click", downloadPDF);
+  $("btnSubmit").addEventListener("click", submitForm);
+  $("btnSample").addEventListener("click", loadSample);
+  $("btnPrint").addEventListener("click", function(){ render(); window.print(); });
+  $("menuToggle").addEventListener("click", function(){ $("mainNav").classList.toggle("open"); });
+
+  /* show success if returning from FormSubmit redirect */
+  if(/[?&]sent=1/.test(location.search)){ showOK(); }
+
+  /* initial render */
+  render();
+})();
+</script>
+</body>
+</html>
