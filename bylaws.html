@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Free Nonprofit Bylaws Generator | A2Z Filings</title>
-<meta name="description" content="Generate 501(c)(3) nonprofit bylaws in minutes. Fill simple fields or describe your nonprofit in plain words (or by voice) and let AI write organized bylaws. Preview live, download a PDF, and submit to A2Z Filings." />
+<meta name="description" content="Generate 501(c)(3) nonprofit bylaws in minutes. Fill simple fields or describe your nonprofit in plain words and let AI write organized bylaws. Preview live, download a PDF, and submit to A2Z Filings." />
 <link rel="icon" href="assets/logo-a2z.jpg" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -50,7 +50,7 @@
   <div class="wrap">
     <span class="eyebrow">Free Tool &bull; Powered by A2Z Filings</span>
     <h1>Generate Your Nonprofit's <span>Bylaws</span> in Minutes</h1>
-    <p>Describe your nonprofit in plain words — or by voice — and let AI write organized 501(c)(3) bylaws for you. Or fill the simple fields yourself. Preview live, download a PDF, and send a copy to our team.</p>
+    <p>Describe your nonprofit in plain words and let AI write organized 501(c)(3) bylaws for you — or fill the simple fields yourself. Preview live, download a PDF, and send a copy to our team.</p>
     <div class="steps">
       <div class="s"><b>1.</b> Describe it or fill the fields</div>
       <div class="s"><b>2.</b> Preview your bylaws</div>
@@ -74,20 +74,13 @@
         <span class="ai-badge">Claude Opus &middot; Highest Model</span>
       </div>
       <div class="ai-body">
-        <p class="lead">Just describe your nonprofit in your own words — its name, mission, where it's based, board size, anything you know. AI fills out the whole form and writes organized 501(c)(3) bylaws. You can also use the microphone and talk to it; say <b>"stop"</b> when you're done.</p>
+        <p class="lead">Just describe your nonprofit in your own words — its name, mission, where it's based, board size, anything you know. AI fills out the whole form and writes organized 501(c)(3) bylaws, then outlines anything it couldn't determine in red for you to complete.</p>
         <div class="ai-input-wrap">
           <textarea id="aiText" placeholder="e.g. We're starting Green Future Alliance, an environmental nonprofit in Austin, Texas. Our mission is to plant trees and teach kids about conservation. We'll have about 7 board members serving 2-year terms, a President, Secretary and Treasurer, and meet quarterly. Fiscal year ends December 31..."></textarea>
         </div>
         <div class="ai-controls">
           <button type="button" id="btnAiGen" class="btn btn-gold">&#10024; Generate by AI</button>
-          <button type="button" id="btnMic" class="btn-mic"><span id="micIcon">&#127908;</span> <span id="micLabel">Speak</span></button>
           <span class="ai-hint" id="aiHint">Tip: the more detail, the better the bylaws.</span>
-        </div>
-
-        <div class="voice-wave" id="voiceWave">
-          <canvas id="waveCanvas" width="600" height="48"></canvas>
-          <span class="voice-status" id="voiceStatus">Listening… say "stop" when done</span>
-          <button type="button" class="vstop" id="btnVoiceStop">Stop</button>
         </div>
 
         <div class="ai-stream" id="aiStream"></div>
@@ -500,9 +493,9 @@
           }catch(e){}
         }
       }
-      applyAi(full);                       // fills the form + renders the preview (never shows raw data)
+      applyAi(full); flagMissing();        // fill the form + preview, then outline any blanks in red
       var org=esc(val("orgName")||"your nonprofit");
-      stream.innerHTML='&#10003; <b>Done!</b> I filled out the form and drafted bylaws for <b>'+org+'</b>. Scroll down to review and edit, then Download or Submit.';
+      stream.innerHTML='&#10003; <b>Done!</b> I drafted bylaws for <b>'+org+'</b> and filled in what I could. Any field <b style="color:#ffd7d9">outlined in red</b> below still needs your input — scroll down to complete it, then Download or Submit.';
       $("aiHint").textContent="✓ Bylaws generated — review the preview and edit anything.";
       window.scrollTo({top:$("previewPanel").offsetTop-80,behavior:"smooth"});
     }catch(e){
@@ -516,91 +509,22 @@
 
   function doGenerate(){
     var t=(val("aiText")||"").trim();
-    if(!t){ $("aiText").focus(); aiErr("Type a description of your nonprofit first (or use the microphone)."); return; }
+    if(!t){ $("aiText").focus(); aiErr("Type a description of your nonprofit first."); return; }
     streamClaude(t);
   }
 
-  /* ================= VOICE ================= */
-  var rec=null, listening=false, rafId=null;
-  var liveFinal="", lastVoiceAt=0, level=0, phase=0, startedAt=0, hintShown=false;
-  function supportsSR(){ return !!(window.SpeechRecognition||window.webkitSpeechRecognition); }
-  function vStatus(t){ var e=$("voiceStatus"); if(e) e.textContent=t; }
-  function setMicUI(on){
-    var b=$("btnMic"); if(!b) return;
-    if(on){ b.classList.add("live"); $("micIcon").innerHTML="&#9632;"; $("micLabel").textContent="Stop"; }
-    else  { b.classList.remove("live"); $("micIcon").innerHTML="&#127908;"; $("micLabel").textContent="Speak"; }
+  /* ---------- highlight fields the AI couldn't fill (only after a generation) ---------- */
+  function flagMissing(){
+    var els=document.querySelectorAll("#dataForm input, #dataForm textarea");
+    Array.prototype.forEach.call(els,function(el){
+      if(el.readOnly || el.type==="hidden"){ return; }
+      var box=el.closest(".field");
+      var optional=box ? /\boptional\b/i.test(box.textContent) : false;   // don't flag fields marked optional (e.g. EIN)
+      el.classList.remove("missing");
+      if(!optional && !(el.value||"").trim()){ el.classList.add("missing"); }
+    });
   }
-  function startVoice(){
-    if(listening) return;
-    if(!supportsSR()){ aiErr("Voice typing needs Chrome, Edge, or Safari. You can still type your description in the box."); return; }
-    aiClearErr();
-    listening=true; liveFinal=(val("aiText")?val("aiText")+" ":""); lastVoiceAt=0; level=0; startedAt=Date.now(); hintShown=false;
-    setMicUI(true);
-    $("voiceWave").classList.add("show"); vStatus("Listening… start talking");
-    runWave();   // bars stay flat and rise ONLY when the recognizer actually hears your voice
-
-    var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-    rec=new SR(); rec.continuous=true; rec.interimResults=true; rec.lang="en-US";
-    var heard=function(){ lastVoiceAt=Date.now(); };
-    rec.onsoundstart=heard; rec.onspeechstart=heard;     // mic detected sound/speech -> bars move
-    rec.onresult=function(e){
-      lastVoiceAt=Date.now();
-      var interim="";
-      for(var i=e.resultIndex;i<e.results.length;i++){
-        var tr=e.results[i][0].transcript;
-        if(e.results[i].isFinal){
-          if(/\bstop\b[.!]?\s*$/i.test(tr.trim())){ liveFinal+=tr.replace(/\bstop\b[.!]?\s*$/i,""); $("aiText").value=liveFinal.trim(); stopVoice(); return; }
-          liveFinal+=tr+" ";
-        } else interim+=tr;
-      }
-      var full=(liveFinal+interim).trim();
-      $("aiText").value=full;
-      if(full) vStatus('"'+(full.length>64?"…"+full.slice(-64):full)+'"');
-    };
-    rec.onerror=function(e){
-      if(e.error==="not-allowed"||e.error==="service-not-allowed"){
-        aiErr("Your microphone is blocked for this site. Click the 🎤 or 🔒 icon in the address bar, set Microphone to Allow, reload the page, then click Speak again.");
-        stopVoice();
-      } else if(e.error==="audio-capture"){
-        aiErr("No microphone was found. Make sure one is connected and selected as your input device, then try again.");
-        stopVoice();
-      }
-      /* 'no-speech' / 'aborted' happen during normal pauses — keep listening */
-    };
-    rec.onend=function(){ if(listening){ try{ rec.start(); }catch(e){} } };
-    try{ rec.start(); }catch(e){ /* onend will retry */ }
-  }
-  function stopVoice(){
-    if(!listening) return; listening=false;
-    try{ if(rec){ rec.onend=null; rec.stop(); } }catch(e){}
-    setMicUI(false);
-    vStatus((val("aiText")||"").trim() ? "Got it — review the text, then click “Generate by AI”." : "Stopped.");
-    setTimeout(function(){ $("voiceWave").classList.remove("show"); },1100);
-    if(rafId) cancelAnimationFrame(rafId); rafId=null;
-    var cv=$("waveCanvas"); if(cv){ var c=cv.getContext("2d"); c.clearRect(0,0,cv.width,cv.height); }
-  }
-  function runWave(){
-    var cv=$("waveCanvas"); if(!cv) return; var ctx=cv.getContext("2d");
-    (function draw(){
-      rafId=requestAnimationFrame(draw);
-      var w=cv.width=cv.clientWidth||600, h=cv.height||48; ctx.clearRect(0,0,w,h);
-      var talking=(lastVoiceAt>0)&&(Date.now()-lastVoiceAt<300);   // "on" only right after the recognizer heard you
-      level += ((talking?1:0)-level)*0.22;                          // smooth rise/fall
-      phase+=0.32;
-      var n=40, bw=w/n;
-      for(var i=0;i<n;i++){
-        var shape=0.30+0.70*Math.abs(Math.sin(phase*0.6+i*0.5));
-        var amp=level*shape;                  // ~0 when silent -> bars stay flat; rise only when you talk
-        var bh=Math.max(2, amp*h);
-        ctx.fillStyle="rgba(247,197,24,"+(0.30+amp*0.70)+")";
-        ctx.fillRect(i*bw+1,(h-bh)/2,bw-2,bh);
-      }
-      if(listening && !hintShown && (Date.now()-startedAt)>6000 && lastVoiceAt===0 && !(val("aiText")||"").trim()){
-        hintShown=true;
-        vStatus("Not hearing you yet — check your mic is unmuted and allowed (🎤 icon in the address bar), then talk.");
-      }
-    })();
-  }
+  function clearMissing(el){ if(el && el.classList && el.classList.contains("missing") && (el.value||"").trim()){ el.classList.remove("missing"); } }
 
   /* ---------- wire up ---------- */
   var f=$("dataForm");
@@ -612,8 +536,7 @@
   $("btnSample").addEventListener("click",loadSample);
   $("btnAiGen").addEventListener("click",doGenerate);
   $("btnSaveKey").addEventListener("click",function(){ var k=val("aiKey").trim(); if(!k){ $("aiKey").focus(); return; } setKey(k); $("aiKeyBox").classList.remove("show"); doGenerate(); });
-  $("btnMic").addEventListener("click",function(){ listening?stopVoice():startVoice(); });
-  $("btnVoiceStop").addEventListener("click",stopVoice);
+  f.addEventListener("input",function(e){ clearMissing(e.target); });   // drop the red outline once a field is filled
   $("menuToggle").addEventListener("click",function(){ $("mainNav").classList.toggle("open"); });
   if(/[?&]sent=1/.test(location.search)){ showOK(); }
   render();

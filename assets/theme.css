@@ -89,6 +89,8 @@ textarea{resize:vertical;min-height:80px}
 .money input{padding-left:24px}
 .calc{background:#f3f6fd;border:1.5px dashed var(--blue)}
 .calc-label{font-size:.78rem;color:var(--blue-text);font-weight:700}
+/* fields the AI couldn't fill — outlined red so the user completes them */
+input.missing,textarea.missing,select.missing{border-color:var(--red)!important;box-shadow:0 0 0 3px rgba(224,26,34,.20)!important;background:#fff7f7}
 .actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:8px}
 .actions .btn{padding:13px 22px;font-size:.98rem}
 .btn-wide{flex:1;min-width:170px}
