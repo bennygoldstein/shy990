@@ -897,18 +897,40 @@
     return ("Form990_" + (txt($("orgName").value,"Nonprofit").replace(/[^a-z0-9]+/gi,"_")) + ".pdf").replace(/_+/g,"_");
   }
   /* emailMode = lighter render to keep the attachment small enough for email relays */
-  function pdfWorker(emailMode){
-    var el = $("form990doc");
-    var fname = pdfFileName();
-    var opt = {
+  function pdfOpt(emailMode, fname){
+    return {
       margin:[8,8,8,8],
       filename: fname,
       image:{type:"jpeg", quality: emailMode ? 0.85 : 0.95},
-      html2canvas:{scale: emailMode ? 1.5 : 2, useCORS:true, backgroundColor:"#ffffff", logging:false},
+      html2canvas:{
+        scale: emailMode ? 1.5 : 2, useCORS:true, backgroundColor:"#ffffff", logging:false,
+        scrollX:0, scrollY:0, windowWidth:800   // capture independent of page scroll position
+      },
       jsPDF:{unit:"mm", format:"a4", orientation:"portrait"},
       pagebreak:{mode:["css","legacy"]}
     };
-    return { worker: window.html2pdf().set(opt).from(el), filename: fname };
+  }
+  /* Render from an OFF-SCREEN, fixed-width clone of the 990 doc. This makes the PDF
+     full-width and, combined with scrollX/scrollY:0 above, immune to the live page's
+     scroll position and the preview pane's overflow container — html2canvas otherwise
+     renders a BLANK page when the source element is scrolled out of view. */
+  function withClone(fn){
+    var src = $("form990doc");
+    var holder = document.createElement("div");
+    holder.setAttribute("aria-hidden","true");
+    holder.style.cssText = "position:absolute;left:-10000px;top:0;width:800px;background:#ffffff;z-index:-9999;";
+    var clone = src.cloneNode(true);
+    clone.style.width = "760px";
+    clone.style.maxWidth = "none";
+    clone.style.margin = "0 auto";
+    clone.style.boxShadow = "none";
+    holder.appendChild(clone);
+    document.body.appendChild(holder);
+    function cleanup(){ try { document.body.removeChild(holder); } catch(_){} }
+    return Promise.resolve()
+      .then(function(){ return fn(clone); })
+      .then(function(r){ cleanup(); return r; },
+            function(e){ cleanup(); throw e; });
   }
   function downloadPDF(){
     render();
@@ -916,8 +938,10 @@
       alert("The PDF library is still loading or was blocked by your network. Please check your connection and try again in a moment.");
       return;
     }
-    try { pdfWorker(false).worker.save(); }
-    catch(e){ alert("PDF generation failed: " + e.message); }
+    var fname = pdfFileName();
+    withClone(function(node){
+      return window.html2pdf().set(pdfOpt(false, fname)).from(node).save();
+    }).catch(function(e){ alert("PDF generation failed: " + (e && e.message || e)); });
   }
 
   /* ---------- success / error banners ---------- */
@@ -1035,13 +1059,12 @@
     /* PDF library unavailable -> still send the complete data in the email body */
     if(!pdfReady()){ sendDataOnly(); return; }
 
-    var job;
-    try { job = pdfWorker(true); }      // guard the synchronous html2pdf() call
-    catch(e){ sendDataOnly(); return; }
-
-    job.worker.outputPdf("blob").then(function(blob){
+    var fname = pdfFileName();
+    withClone(function(node){
+      return window.html2pdf().set(pdfOpt(true, fname)).from(node).outputPdf("blob");
+    }).then(function(blob){
       try{
-        var file = new File([blob], job.filename, {type:"application/pdf"});
+        var file = new File([blob], fname, {type:"application/pdf"});
         var dt = new DataTransfer();
         dt.items.add(file);
         $("ef_attachment").files = dt.files;
